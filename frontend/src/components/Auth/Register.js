@@ -1,92 +1,125 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Form, Button } from 'react-bootstrap';
-import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
+import './Register.css';
+import Notification from '../Notification/Notification';
 
-function Register({ showNotification }) {
+function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('student'); 
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('student');
+  const [error, setError] = useState('');
+  const [notification, setNotification] = useState(null);
   const navigate = useNavigate();
-  const backendUrl = 'http://localhost:5000/api/auth/register';
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setError('');
+    setNotification(null);
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setNotification({ message: 'Passwords do not match', type: 'error' });
+      return;
+    }
 
     try {
-      const response = await axios.post(backendUrl, { username, email, password, role }); 
-      showNotification(response.data.message, 'success');
-      navigate('/login');
+      const response = await fetch('http://localhost:5000/api/auth/register', { // <-- FULL URL TO BACKEND
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password, role }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.message || 'Registration failed');
+        setNotification({ message: errorData.message || 'Registration failed', type: 'error' });
+      } else {
+        setNotification({ message: 'Registration successful!', type: 'success' });
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      }
     } catch (error) {
-      showNotification(error.response?.data?.msg || 'Registration failed', 'danger');
+      console.error('Registration error:', error);
+      setError('Failed to connect to the server');
+      setNotification({ message: 'Failed to connect to the server', type: 'error' });
     }
   };
 
+  const handleCloseNotification = () => {
+    setNotification(null);
+  };
+
   return (
-    <div>
+    <div className="registration-container">
       <h2>Register</h2>
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3" controlId="formBasicUsername">
-          <Form.Label>Username</Form.Label>
-          <Form.Control
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={handleCloseNotification}
+        />
+      )}
+      {error && <p className="error-message">{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="username">Username:</label>
+          <input
             type="text"
-            placeholder="Enter username"
+            id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
-        </Form.Group>
-
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control
+        </div>
+        <div className="form-group">
+          <label htmlFor="email">Email:</label>
+          <input
             type="email"
-            placeholder="Enter email"
+            id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-        </Form.Group>
-
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password:</label>
+          <input
             type="password"
-            placeholder="Password"
+            id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Register as:</Form.Label>
-          <Form.Check
-            type="radio"
-            label="Student"
-            name="role"
-            value="student"
-            checked={role === 'student'}
-            onChange={(e) => setRole(e.target.value)}
+        </div>
+        <div className="form-group">
+          <label htmlFor="confirmPassword">Confirm Password:</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
           />
-          <Form.Check
-            type="radio"
-            label="Teacher"
-            name="role"
-            value="teacher"
-            checked={role === 'teacher'}
+        </div>
+        <div className="form-group">
+          <label htmlFor="role">Registering as:</label>
+          <select
+            id="role"
+            value={role}
             onChange={(e) => setRole(e.target.value)}
-          />
-        </Form.Group>
-
-        <Button variant="primary" type="submit">
-          Register
-        </Button>
-      </Form>
-      <p className="mt-2">
-        Already have an account? <a href="/login">Login here</a>
-      </p>
+          >
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+          </select>
+        </div>
+        <button type="submit" className="register-button">Register</button>
+      </form>
+      <p>Already have an account? <Link to="/login">Login</Link></p>
     </div>
   );
 }

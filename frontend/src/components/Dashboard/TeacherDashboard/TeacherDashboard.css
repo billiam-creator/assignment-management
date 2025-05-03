@@ -1,0 +1,40 @@
+.teacher-dashboard-container {
+    font-family: sans-serif;
+    padding: 20px;
+  }
+  
+  .teacher-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+  }
+  
+  .teacher-dashboard-header h1 {
+    color: #333;
+  }
+  
+  .teacher-dashboard-header nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+  }
+  
+  .teacher-dashboard-header nav ul li a {
+    text-decoration: none;
+    color: #007bff;
+  }
+  
+  .teacher-dashboard-content {
+    margin-bottom: 20px;
+  }
+  
+  .teacher-dashboard-footer {
+    text-align: center;
+    color: #777;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+  }

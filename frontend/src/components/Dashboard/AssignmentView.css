@@ -1,0 +1,85 @@
+.assignment-view {
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 5px;
+  }
+  
+  .assignment-view h3 {
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .assignment-view .due-date {
+    color: #777;
+    margin-bottom: 10px;
+    font-style: italic;
+  }
+  
+  .assignment-view .description {
+    color: #555;
+    margin-bottom: 15px;
+    line-height: 1.6;
+  }
+  
+  .submission-form {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .answer-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: inherit;
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  
+  .submit-button,
+  .back-button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95em;
+  }
+  
+  .submit-button {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .submit-button:hover {
+    background-color: #1e7e34;
+  }
+  
+  .back-button {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .back-button:hover {
+    background-color: #545b62;
+  }

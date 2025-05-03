@@ -1,86 +1,59 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './components/Auth/Login';
-import Register from './components/Auth/Register';
-import StudentDashboard from './components/Dashboard/StudentDashboard';
-import TeacherDashboard from './components/Dashboard/TeacherDashboard';
+import Dashboard from './components/Dashboard/Dashboard'; // Student Dashboard
+import TeacherDashboard from './components/Dashboard/TeacherDashboard/TeacherDashboard'; // Main Teacher Dashboard
+import CreateAssignmentForm from './components/Dashboard/TeacherDashboard/CreateAssignmentForm';
+import SubmitAssignment from './components/Dashboard/SubmitAssignment';
+import GradeSubmissionView from './components/Dashboard/TeacherDashboard/GradeSubmissionView';
 import Notification from './components/Notification/Notification';
-import CreateAssignment from './components/Assignment/CreateAssignment';
-import SubmitAssignment from './components/Assignment/SubmitAssignment';
-import GradeAssignment from './components/Assignment/GradeAssignment';
-import FeedbackDisplay from './components/Assignment/FeedbackDisplay';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { AuthProvider, useAuth } from './hooks/useAuth';
+import ClassList from './components/Dashboard/TeacherDashboard/ClassList';
+import AssignmentList from './components/Dashboard/TeacherDashboard/AssignmentList';
+import SubmissionList from './components/Dashboard/TeacherDashboard/SubmissionList';
+import AssignmentResults from './components/Dashboard/TeacherDashboard/AssignmentResults';
+import LoginPage from './components/Auth/Login';      
+import RegistrationPage from './components/Auth/Register'; 
+
+
+const isAuthenticated = () => {
+  return localStorage.getItem('token') !== null; 
+};
+
+const PrivateRoute = ({ element, ...rest }) => {
+  return isAuthenticated() ? (
+    element 
+  ) : (
+    <Navigate to="/login" replace />
+  );
+};
 
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <div className="app-container">
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" replace />} /> {/* Redirect root to /login */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegistrationPage />} />
+
+          {/* Protected routes - only accessible if authenticated */}
+          <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
+          <Route path="/teacher" element={<PrivateRoute element={<TeacherDashboard />} />} >
+            <Route path="classes" element={<PrivateRoute element={<ClassList />} />} />
+            <Route path="classes/:classId/assignments" element={<PrivateRoute element={<AssignmentList />} />} />
+            <Route path="assignments/:assignmentId/submissions" element={<PrivateRoute element={<SubmissionList />} />} />
+            <Route path="assignments/:assignmentId/results" element={<PrivateRoute element={<AssignmentResults />} />} />
+            <Route path="new-assignment" element={<PrivateRoute element={<CreateAssignmentForm />} />} />
+            <Route path="submissions/:submissionId/:assignmentId/grade" element={<PrivateRoute element={<GradeSubmissionView />} />} />
+          </Route>
+          <Route path="/student/assignments/:assignmentId/submit" element={<PrivateRoute element={<SubmitAssignment />} />} />
+
+          {/* You might not need a direct route for Notification */}
+          {/* <Route path="/notification" element={<Notification message="Example Notification" type="info" />} /> */}
+
+          {/* Add other public routes if needed */}
+        </Routes>
+      </div>
     </Router>
-  );
-}
-
-function AppContent() {
-  const { user, isAuthenticated, loading } = useAuth();
-  const [notification, setNotification] = useState(null);
-
-  const showNotification = (message, type = 'success') => {
-    setNotification({ message, type });
-    setTimeout(() => {
-      setNotification(null);
-    }, 3000);
-  };
-
-  if (loading) {
-    return <div>Loading...</div>; // Or a spinner
-  }
-
-  return (
-    <div className="container mt-4">
-      {notification && (
-        <Notification message={notification.message} type={notification.type} />
-      )}
-
-      <Routes>
-        <Route
-          path="/login"
-          element={<Login showNotification={showNotification} />}
-        />
-        <Route
-          path="/register"
-          element={<Register showNotification={showNotification} />}
-        />
-        <Route
-          path="/dashboard"
-          element={
-            isAuthenticated ? (
-              user?.role === 'student' ? (
-                <StudentDashboard />
-              ) : (
-                <TeacherDashboard />
-              )
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-        {isAuthenticated && user?.role === 'teacher' && (
-          <>
-            <Route path="/create-assignment" element={<CreateAssignment />} />
-            <Route path="/grade-assignment/:assignmentId" element={<GradeAssignment />} />
-          </>
-        )}
-        {isAuthenticated && user?.role === 'student' && (
-          <>
-            <Route path="/submit-assignment/:assignmentId" element={<SubmitAssignment />} />
-            <Route path="/view-feedback/:assignmentId" element={<FeedbackDisplay />} />
-          </>
-        )}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </div>
   );
 }
 

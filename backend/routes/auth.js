@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require('../models/User'); // Assuming your User model is in '../models/User'
 
 // @route   POST /api/auth/register
 // @desc    Register a new user
@@ -10,78 +10,71 @@ const User = require('../models/User');
 router.post('/register', async (req, res) => {
   const { username, email, password, role } = req.body;
 
+  if (!username || !email || !password) {
+    return res.status(400).json({ message: 'Please provide all required fields.' });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: 'Invalid email format.' });
+  }
+
   try {
-    // Check if user exists by email
-    let userByEmail = await User.findOne({ email });
-    if (userByEmail) {
-      return res.status(400).json({ msg: 'User with this email already exists' });
+    // Check if user exists by username or email
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      return res.status(409).json({ message: 'Username or email already exists.' });
     }
 
-    // Check if username exists
-    let userByUsername = await User.findOne({ username });
-    if (userByUsername) {
-      return res.status(400).json({ msg: 'User with this username already exists' });
-    }
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = new User({
+    const newUser = new User({
       username,
       email,
-      password,
-      role,
+      password: hashedPassword,
+      role: role || 'student', // Default to 'student' if role is not provided
     });
 
-    await user.save();
+    await newUser.save();
 
-    const payload = {
-      user: {
-        id: user.id,
-        role: user.role,
-      },
-    };
+    res.status(201).json({ message: 'User registered successfully!' });
 
-    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
-      if (err) throw err;
-      res.json({ token, user: { id: user.id, role: user.role }, message: 'Registration successful' });
-    });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+  } catch (error) {
+    console.error('Error during registration:', error);
+    res.status(500).json({ message: 'Failed to register user.' });
   }
 });
 
 // @route   POST /api/auth/login
-// @desc    Authenticate user & get token
+// @desc    Authenticate user and get token
 // @access  Public
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { identifier, password } = req.body; // Using 'identifier' for username or email
 
   try {
-    let user = await User.findOne({ email });
+    const user = await User.findOne({ $or: [{ username: identifier }, { email: identifier }] });
 
     if (!user) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
-    const isMatch = await user.matchPassword(password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    if (!isMatch) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
-    const payload = {
-      user: {
-        id: user.id,
-        role: user.role,
-      },
-    };
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET || 'your-secret-key', // Use environment variable for secret
+      { expiresIn: '1h' }
+    );
 
-    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
-      if (err) throw err;
-      res.json({ token, user: { id: user.id, role: user.role }, message: 'Login successful' });
-    });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(200).json({ token, userId: user._id, role: user.role, message: 'Login successful!' });
+
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ message: 'Failed to login.' });
   }
 });
 

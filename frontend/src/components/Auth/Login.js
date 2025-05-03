@@ -1,65 +1,98 @@
+// src/components/Auth/Login.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Form, Button } from 'react-bootstrap';
-import axios from 'axios';
-import { useAuth } from '../../hooks/useAuth';
+import { Link, useNavigate } from 'react-router-dom';
+import './Login.css';
+import Notification from '../Notification/Notification';
 
-function Login({ showNotification }) {
-  const [email, setEmail] = useState('');
+function Login() {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [notification, setNotification] = useState(null);
   const navigate = useNavigate();
-  const backendUrl = 'http://localhost:5000/api/auth/login';
-  const { login } = useAuth();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setError('');
+    setNotification(null);
 
     try {
-      const response = await axios.post(backendUrl, { email, password });
-      const { token, user, message } = response.data;
-      login(token, user);
-      showNotification(message, 'success');
-      console.log('Login successful in Login component, navigating...'); 
-      navigate('/dashboard');
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ identifier: username, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.message || 'Login failed');
+        setNotification({ message: errorData.message || 'Login failed', type: 'error' });
+      } else {
+        const userData = await response.json();
+        console.log('Login successful:', userData);
+        localStorage.setItem('token', userData.token);
+        localStorage.setItem('userId', userData.userId);
+        localStorage.setItem('role', userData.role);
+        localStorage.setItem('username', userData.username); // Store the username
+        setNotification({ message: 'Login successful!', type: 'success' });
+        setTimeout(() => {
+          if (userData.role === 'student') {
+            navigate('/dashboard');
+          } else if (userData.role === 'teacher') {
+            navigate('/teacher/classes');
+          } else {
+            navigate('/dashboard');
+          }
+        }, 2000);
+      }
     } catch (error) {
-      console.error('Login error:', error); 
-      showNotification(error.response?.data?.msg || 'Login failed', 'danger');
+      console.error('Login error:', error);
+      setError('Failed to connect to the server');
+      setNotification({ message: 'Failed to connect to the server', type: 'error' });
     }
   };
 
+  const handleCloseNotification = () => {
+    setNotification(null);
+  };
+
   return (
-    <div>
+    <div className="login-container">
       <h2>Login</h2>
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control
-            type="email"
-            placeholder="Enter email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={handleCloseNotification}
+        />
+      )}
+      {error && <p className="error-message">{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="username">Username:</label>
+          <input
+            type="text"
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
-        </Form.Group>
-
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password:</label>
+          <input
             type="password"
-            placeholder="Password"
+            id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-        </Form.Group>
-
-        <Button variant="primary" type="submit">
-          Login
-        </Button>
-      </Form>
-      <p className="mt-2">
-        Don't have an account? <a href="/register">Register here</a>
-      </p>
+        </div>
+        <button type="submit" className="login-button">Login</button>
+      </form>
+      <p>Don't have an account? <Link to="/register">Register</Link></p>
     </div>
   );
 }

@@ -1,11 +1,18 @@
 import React from 'react';
-import Alert from 'react-bootstrap/Alert';
+import './Notification.css';
 
-function Notification({ message, type }) {
+function Notification({ message, type, onClose }) {
+  const className = `notification ${type}`;
+
   return (
-    <Alert variant={type}>
-      {message}
-    </Alert>
+    <div className={className}>
+      <p>{message}</p>
+      {onClose && (
+        <button onClick={onClose} className="close-button">
+          &times;
+        </button>
+      )}
+    </div>
   );
 }
 

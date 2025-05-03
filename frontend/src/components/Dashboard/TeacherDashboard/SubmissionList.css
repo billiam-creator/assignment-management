@@ -1,0 +1,51 @@
+.submission-list-container h2 {
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .submission-list-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    background-color: white;
+    border-radius: 4px;
+  }
+  
+  .submission-list-container th,
+  .submission-list-container td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .submission-list-container th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .submission-list-container tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .submission-list-container tbody td a {
+    color: #007bff;
+    text-decoration: none;
+    margin-right: 10px;
+  }
+  
+  .submission-list-container tbody td a:hover {
+    text-decoration: underline;
+  }
+  
+  .back-to-assignments {
+    display: block;
+    margin-top: 15px;
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .back-to-assignments:hover {
+    text-decoration: underline;
+  }

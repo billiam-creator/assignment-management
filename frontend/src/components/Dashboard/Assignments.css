@@ -1,0 +1,39 @@
+.assignments-list ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .assignment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+  }
+  
+  .assignment-details strong {
+    font-size: 1.1em;
+    color: #333;
+  }
+  
+  .assignment-details p {
+    color: #666;
+    margin: 5px 0;
+  }
+  
+  .start-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+  }
+  
+  .start-button:hover {
+    background-color: #0056b3;
+  }

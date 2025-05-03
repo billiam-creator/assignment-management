@@ -1,0 +1,56 @@
+.assignment-list-container h2 {
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .assignment-list-container ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .assignment-item {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .assignment-item a {
+    text-decoration: none;
+    color: #333;
+  }
+  
+  .assignment-item p {
+    color: #777;
+    margin-left: 10px;
+  }
+  
+  .create-new-link {
+    display: block;
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+  
+  .create-new-link:hover {
+    background-color: #0056b3;
+  }
+  
+  .back-to-classes {
+    display: block;
+    margin-top: 15px;
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .back-to-classes:hover {
+    text-decoration: underline;
+  }
