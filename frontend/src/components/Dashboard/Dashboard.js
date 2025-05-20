@@ -28,6 +28,83 @@ const Dashboard = () => {
     };
   }, []);
 
+  // Fetch user information
+  function fetchUserInfo() {
+    return new Promise((resolve, reject) => {
+      // Make an API call to fetch user information
+      fetch('/api/user-info')
+        .then(response => response.json())
+        .then(data => resolve(data))
+        .catch(error => reject(error));
+    });
+  }
+
+  // Fetch enrolled courses
+  function fetchEnrolledCourses() {
+    return new Promise((resolve, reject) => {
+      // Make an API call to fetch enrolled courses
+      fetch('/api/enrolled-courses')
+        .then(response => response.json())
+        .then(data => resolve(data))
+        .catch(error => reject(error));
+    });
+  }
+
+  // Fetch assignments
+  function fetchAssignments() {
+    return new Promise((resolve, reject) => {
+      // Make an API call to fetch assignments
+      fetch('/api/assignments')
+        .then(response => response.json())
+        .then(data => resolve(data))
+        .catch(error => reject(error));
+    });
+  }
+
+  // Update the dashboard UI
+  function updateDashboardUI(userInfo, enrolledCourses, assignments) {
+    // Update the "My Information" section
+    document.getElementById('name').textContent = userInfo.name;
+    document.getElementById('major').textContent = userInfo.major;
+
+    // Update the "Enrolled Courses" section
+    const enrolledCoursesElement = document.getElementById('enrolled-courses');
+    if (enrolledCourses.length > 0) {
+      enrolledCoursesElement.innerHTML = '';
+      enrolledCourses.forEach(course => {
+        const courseElement = document.createElement('div');
+        courseElement.textContent = course.name;
+        enrolledCoursesElement.appendChild(courseElement);
+      });
+    } else {
+      enrolledCoursesElement.innerHTML = '<p>You are not enrolled in any courses yet.</p>';
+    }
+
+    // Update the "Assignments" section
+    const assignmentsElement = document.getElementById('assignments');
+    if (assignments.length > 0) {
+      assignmentsElement.innerHTML = '';
+      assignments.forEach(assignment => {
+        const assignmentElement = document.createElement('div');
+        assignmentElement.textContent = assignment.name;
+        assignmentsElement.appendChild(assignmentElement);
+      });
+    } else {
+      assignmentsElement.innerHTML = '<p>No assignments found for your enrolled courses.</p>';
+    }
+  }
+
+  // Initialize the dashboard
+  useEffect(() => {
+    Promise.all([fetchUserInfo(), fetchEnrolledCourses(), fetchAssignments()])
+      .then(([userInfo, enrolledCourses, assignments]) => {
+        updateDashboardUI(userInfo, enrolledCourses, assignments);
+      })
+      .catch(error => {
+        console.error('Error initializing dashboard:', error);
+      });
+  }, []);
+
   return (
     <div className="dashboard-container">
       <div className="sidebar">
@@ -46,6 +123,9 @@ const Dashboard = () => {
           <h2>Dashboard</h2>
           {/* Dashboard content goes here */}
           <p>This is the dashboard content.</p>
+          <p id="name"></p>
+          <p id="major"></p>
+          <div id="enrolled-courses"></div>
         </div>
         <div id="student-records" ref={studentRecordsRef} className="student-records">
           <h2>Student Records</h2>
@@ -75,6 +155,7 @@ const Dashboard = () => {
         <div id="assignments" ref={assignmentsRef} className="assignments">
           <h2>Assignments</h2>
           {/* Assignments content goes here */}
+          <div id="assignments"></div>
           <table>
             <thead>
               <tr>

@@ -35,13 +35,15 @@ function Login() {
         localStorage.setItem('token', userData.token);
         localStorage.setItem('userId', userData.userId);
         localStorage.setItem('role', userData.role);
-        localStorage.setItem('username', userData.username); // Store the username
+        localStorage.setItem('username', userData.username);
         setNotification({ message: 'Login successful!', type: 'success' });
         setTimeout(() => {
           if (userData.role === 'student') {
             navigate('/dashboard');
           } else if (userData.role === 'teacher') {
             navigate('/teacher/classes');
+          } else if (userData.role === 'admin') {
+            navigate('/admin-dashboard');
           } else {
             navigate('/dashboard');
           }
