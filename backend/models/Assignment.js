@@ -35,7 +35,7 @@ const AssignmentSchema = new mongoose.Schema({
       feedback: {
         type: String,
       },
-      submissionLink: { // Or file upload path
+      submissionLink: { 
         type: String,
       },
     },

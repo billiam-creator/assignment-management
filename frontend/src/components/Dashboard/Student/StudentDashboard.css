@@ -1,0 +1,103 @@
+/* StudentDashboard.css */
+.student-dashboard {
+    display: flex;
+    min-height: 100vh;
+    font-family: sans-serif;
+  }
+  
+  .sidebar {
+    background-color: #f8f9fa;
+    color: #495057;
+    width: 200px;
+    padding: 20px;
+  }
+  
+  .sidebar h2 {
+    margin-bottom: 20px;
+    color: #007bff;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar li {
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .sidebar li.active {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .sidebar li:hover {
+    background-color: #e9ecef;
+  }
+  
+  .content {
+    flex-grow: 1;
+    padding: 30px;
+    background-color: #fff;
+  }
+  
+  .header {
+    margin-bottom: 30px;
+  }
+  
+  .header h1 {
+    color: #343a40;
+  }
+  
+  .header p {
+    color: #6c757d;
+  }
+  
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .info-card,
+  .courses-card,
+  .requests-card,
+  .assignments-card {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+  .info-card h3,
+  .courses-card h3,
+  .requests-card h3,
+  .assignments-card h3 {
+    margin-top: 0;
+    color: #343a40;
+    margin-bottom: 15px;
+  }
+  
+  .courses-card ul,
+  .requests-card ul,
+  .assignments-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .courses-card li,
+  .requests-card li,
+  .assignments-card li {
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .courses-card li:last-child,
+  .requests-card li:last-child,
+  .assignments-card li:last-child {
+    border-bottom: none;
+  }

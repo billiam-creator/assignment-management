@@ -1,60 +1,35 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Dashboard from './components/Dashboard/Dashboard'; // Student Dashboard
-import TeacherDashboard from './components/Dashboard/TeacherDashboard/TeacherDashboard'; // Main Teacher Dashboard
-import CreateAssignmentForm from './components/Dashboard/TeacherDashboard/CreateAssignmentForm';
-import SubmitAssignment from './components/Dashboard/SubmitAssignment';
-import GradeSubmissionView from './components/Dashboard/TeacherDashboard/GradeSubmissionView';
+import { BrowserRouter as Router, Route, Routes, Navigate, Link } from 'react-router-dom';
+import RegistrationPage from './components/Auth/RegistrationPage';
+import LoginPage from './components/Auth/LoginPage';
+import ClassList from './components/Dashboard/Teacher/ClassList';
+import AssignmentList from './components/Dashboard/Teacher/AssignmentList';
+import SubmissionList from './components/Dashboard/Teacher/SubmissionList';
+import AssignmentResults from './components/Dashboard/Teacher/AssignmentResults';
+import StudentList from './components/Dashboard/Admin/StudentList';
+import TeacherList from './components/Dashboard/Admin/TeacherList';
 import Notification from './components/Notification/Notification';
-import ClassList from './components/Dashboard/TeacherDashboard/ClassList';
-import AssignmentList from './components/Dashboard/TeacherDashboard/AssignmentList';
-import SubmissionList from './components/Dashboard/TeacherDashboard/SubmissionList';
-import AssignmentResults from './components/Dashboard/TeacherDashboard/AssignmentResults';
-import LoginPage from './components/Auth/Login';      
-import RegistrationPage from './components/Auth/Register'; 
-
-
-const isAuthenticated = () => {
-  return localStorage.getItem('token') !== null; 
-};
-
-const PrivateRoute = ({ element, ...rest }) => {
-  return isAuthenticated() ? (
-    element 
-  ) : (
-    <Navigate to="/login" replace />
-  );
-};
+import SubmitAssignment from './components/Dashboard/SubmitAssignment';
+import AdminDashboard from './components/Dashboard/Admin/AdminDashboard';
+import StudentDashboard from './components/Dashboard/Student/StudentDashboard';
+import TeacherDashboard from './components/Dashboard/Teacher/TeacherDashboard';
+import CourseList from './components/Dashboard/Admin/CourseList';
 
 function App() {
   return (
     <Router>
-      <div className="app-container">
+      <div>
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} /> {/* Redirect root to /login */}
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<LoginPage />} />
           <Route path="/register" element={<RegistrationPage />} />
-
-          {/* Protected routes - only accessible if authenticated */}
-          <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
-          <Route path="/teacher" element={<PrivateRoute element={<TeacherDashboard />} />} >
-            <Route path="classes" element={<PrivateRoute element={<ClassList />} />} />
-            <Route path="classes/:classId/assignments" element={<PrivateRoute element={<AssignmentList />} />} />
-            <Route path="assignments/:assignmentId/submissions" element={<PrivateRoute element={<SubmissionList />} />} />
-            <Route path="assignments/:assignmentId/results" element={<PrivateRoute element={<AssignmentResults />} />} />
-            <Route path="new-assignment" element={<PrivateRoute element={<CreateAssignmentForm />} />} />
-            <Route path="submissions/:submissionId/:assignmentId/grade" element={<PrivateRoute element={<GradeSubmissionView />} />} />
-          </Route>
-          <Route path="/student/assignments/:assignmentId/submit" element={<PrivateRoute element={<SubmitAssignment />} />} />
-
-          {/* You might not need a direct route for Notification */}
-          {/* <Route path="/notification" element={<Notification message="Example Notification" type="info" />} /> */}
-
-          {/* Add other public routes if needed */}
+          <Route path="/student/dashboard" element={<StudentDashboard />} />
+          <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
       </div>
     </Router>
   );
 }
+
 
 export default App;

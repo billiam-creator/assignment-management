@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Assignment = require('../models/Assignment');
-const Submission = require('../models/Submission'); // Ensure path is correct
+const Submission = require('../models/Submission'); 
 
-// POST a new assignment
+
 router.post('/', async (req, res) => {
   const { classId, title, description, dueDate } = req.body;
   try {
@@ -16,12 +16,12 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET submissions for a specific assignment
+
 router.get('/:assignmentId/submissions', async (req, res) => {
   const { assignmentId } = req.params;
   try {
     const submissions = await Submission.find({ assignment: assignmentId })
-      .populate('student', 'name'); // Populate student name
+      .populate('student', 'name'); 
     res.json(submissions);
   } catch (error) {
     console.error('Error fetching submissions:', error);
@@ -29,7 +29,7 @@ router.get('/:assignmentId/submissions', async (req, res) => {
   }
 });
 
-// POST grade and feedback for a submission
+
 router.post('/submissions/:submissionId/grade', async (req, res) => {
   const { submissionId } = req.params;
   const { grade, feedback } = req.body;
@@ -37,12 +37,12 @@ router.post('/submissions/:submissionId/grade', async (req, res) => {
     const updatedSubmission = await Submission.findByIdAndUpdate(
       submissionId,
       { grade: grade, feedback: feedback },
-      { new: true } // Return the updated document
-    ).populate('student', 'name').populate('assignment', 'title'); // Optionally populate student and assignment details
+      { new: true } 
+    ).populate('student', 'name').populate('assignment', 'title'); 
     if (!updatedSubmission) {
       return res.status(404).json({ message: 'Submission not found' });
     }
-    res.json(updatedSubmission); // Send back the updated submission
+    res.json(updatedSubmission); 
   } catch (error) {
     console.error('Error grading submission:', error);
     res.status(500).json({ message: 'Failed to submit grade and feedback' });
@@ -55,7 +55,7 @@ router.get('/:assignmentId/results', async (req, res) => {
   try {
     const submissions = await Submission.find({ assignment: assignmentId })
       .populate('student', 'name')
-      .select('student grade feedback'); // Select only necessary fields
+      .select('student grade feedback'); 
     const results = submissions.map(sub => ({
       studentName: sub.student.name,
       grade: sub.grade,

@@ -3,35 +3,119 @@ const router = express.Router();
 const User = require('../models/User');
 const Assignment = require('../models/Assignment');
 const Submission = require('../models/Submission');
-const Class = require('../models/Class'); // Ensure path is correct
+const Course = require('../models/Course');
+const moment = require('moment');
 
-// GET classes for a specific teacher
-router.get('/:teacherId/classes', async (req, res) => {
-  const { teacherId } = req.params;
-  try {
-    // Assuming your User model (for teachers) has a 'classes' field
-    // that is an array of ObjectIds referencing the Class model.
-    const teacher = await User.findById(teacherId).populate('classes', 'name description');
-    if (!teacher) {
-      return res.status(404).json({ message: 'Teacher not found' });
+
+const isTeacher = (req, res, next) => {
+    if (req.user && req.user.role === 'teacher') {
+        next();
+    } else {
+        return res.status(403).json({ message: 'Unauthorized: Teacher role required' });
     }
-    res.json(teacher.classes);
-  } catch (error) {
-    console.error('Error fetching teacher classes:', error);
-    res.status(500).json({ message: 'Failed to fetch classes' });
-  }
+};
+
+router.use(isTeacher);
+
+
+router.get('/info', async (req, res) => {
+    try {
+        const teacher = await User.findById(req.user.id).select('username name email'); // Include email
+        if (!teacher) {
+            return res.status(404).json({ message: 'Teacher not found' });
+        }
+        res.json(teacher);
+    } catch (error) {
+        console.error('Error fetching teacher info:', error);
+        res.status(500).json({ message: 'Failed to fetch teacher info' });
+    }
 });
 
-// GET assignments for a specific class
-router.get('/classes/:classId/assignments', async (req, res) => {
-  const { classId } = req.params;
-  try {
-    const assignments = await Assignment.find({ class: classId }); // Assuming 'class' field in Assignment model
-    res.json(assignments);
-  } catch (error) {
-    console.error('Error fetching class assignments:', error);
-    res.status(500).json({ message: 'Failed to fetch assignments for this class' });
-  }
+
+router.get('/dashboard-data', async (req, res) => {
+    try {
+        const myCoursesCount = await Course.countDocuments({ instructor: req.user.id });
+        const upcomingAssignmentsCount = await Assignment.countDocuments({
+            instructor: req.user.id,
+            dueDate: { $gte: new Date() }
+        });
+        res.json({ myCoursesCount, upcomingAssignmentsCount });
+    } catch (error) {
+        console.error('Error fetching teacher dashboard data:', error);
+        res.status(500).json({ message: 'Failed to fetch teacher dashboard data' });
+    }
 });
 
-module.exports = router;
+
+router.get('/courses', async (req, res) => {
+    try {
+        const courses = await Course.find({ instructor: req.user.id });
+        res.json(courses);
+    } catch (error) {
+        console.error('Error fetching teacher\'s courses:', error);
+        res.status(500).json({ message: 'Failed to fetch teacher\'s courses' });
+    }
+});
+
+
+router.get('/courses/:courseId/students', async (req, res) => {
+    const { courseId } = req.params;
+    try {
+        
+        const course = await Course.findById(courseId);
+        if (!course || course.instructor.toString() !== req.user.id) {
+            return res.status(404).json({ message: 'Course not found or not taught by you' });
+        }
+       
+        const enrolledStudents = await User.find({ courses: courseId, role: 'student' }).select('username email');
+        res.json(enrolledStudents);
+    } catch (error) {
+        console.error('Error fetching students for course:', error);
+        res.status(500).json({ message: 'Failed to fetch students for this course' });
+    }
+});
+
+
+router.get('/courses/:courseId/assignments', async (req, res) => {
+    const { courseId } = req.params;
+    try {
+        
+        const course = await Course.findById(courseId);
+        if (!course || course.instructor.toString() !== req.user.id) {
+            return res.status(404).json({ message: 'Course not found or not taught by you' });
+        }
+        const assignments = await Assignment.find({ course: courseId, instructor: req.user.id });
+        res.json(assignments);
+    } catch (error) {
+        console.error('Error fetching assignments:', error);
+        res.status(500).json({ message: 'Failed to fetch assignments' });
+    }
+});
+
+
+router.post('/courses/:courseId/assignments', async (req, res) => {
+    const { courseId } = req.params;
+    const { title, description, dueDate } = req.body;
+    try {
+        
+        const course = await Course.findById(courseId);
+        if (!course || course.instructor.toString() !== req.user.id) {
+            return res.status(404).json({ message: 'Course not found or not taught by you' });
+        }
+        const newAssignment = new Assignment({
+            title,
+            description,
+            dueDate,
+            course: courseId,
+            instructor: req.user.id,
+        });
+        await newAssignment.save();
+        res.status(201).json({ message: 'Assignment created successfully', assignment: newAssignment });
+    } catch (error) {
+        console.error('Error creating assignment:', error);
+        res.status(500).json({ message: 'Failed to create assignment' });
+    }
+});
+
+
+module.exports= router;

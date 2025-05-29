@@ -1,0 +1,146 @@
+/* TeacherDashboard.css */
+.teacher-dashboard {
+    display: flex;
+    min-height: 100vh;
+    font-family: sans-serif;
+  }
+  
+  .sidebar {
+    background-color: #f8f9fa;
+    color: #495057;
+    width: 200px;
+    padding: 20px;
+  }
+  
+  .sidebar h2 {
+    margin-bottom: 20px;
+    color: #28a745; /* Green theme */
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar li {
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .sidebar li.active {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .sidebar li:hover {
+    background-color: #e9ecef;
+  }
+  
+  .content {
+    flex-grow: 1;
+    padding: 30px;
+    background-color: #fff;
+  }
+  
+  .header {
+    margin-bottom: 30px;
+  }
+  
+  .header h1 {
+    color: #38c172; /* Light green */
+  }
+  
+  .header p {
+    color: #81e9a5; /* Lighter green */
+  }
+  
+  .overview-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .overview-cards .card {
+    background-color: #f0fff4; /* Very light green */
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .overview-cards .card h3 {
+    margin-top: 0;
+    color: #28a745;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+  
+  .overview-cards .card .number {
+    font-size: 2rem;
+    color: #1e7e34; /* Darker green */
+    font-weight: bold;
+  }
+  
+  .my-courses-section h2,
+  .upcoming-assignments-section h2 {
+    color: #28a745;
+    margin-bottom: 20px;
+  }
+  
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, auto));
+    gap: 20px;
+  }
+  
+  .course-card {
+    background-color: #f0fff4;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .course-card h3 {
+    color: #1e7e34;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  
+  .course-card p {
+    color: #495057;
+    margin-bottom: 15px;
+  }
+  
+  .view-students-button,
+  .add-assignment-button {
+    background-color: #3498db; /* Blue buttons */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  .view-students-button:hover,
+  .add-assignment-button:hover {
+    background-color: #2980b9;
+  }
+  
+  .upcoming-assignments-section ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .upcoming-assignments-section li {
+    padding: 10px 0;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .upcoming-assignments-section li:last-child {
+    border-bottom: none;
+  }
