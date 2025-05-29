@@ -1,15 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import { AuthProvider } from './hooks/useAuth';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './index.css'; // If you have a global CSS file
+import 'react-toastify/dist/ReactToastify.css';
+import './index.css'; // Create this if you don't have it
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
-  </React.StrictMode>
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>
 );

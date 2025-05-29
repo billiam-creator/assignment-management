@@ -6,7 +6,7 @@ const EnrollmentRequest = require('../models/EnrollmentRequest');
 const requireAuth = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
 
-
+// Apply auth and isAdmin middleware to all routes in this router
 router.use(requireAuth);
 router.use(isAdmin);
 
@@ -15,8 +15,8 @@ router.get('/dashboard-data', async (req, res) => {
         const totalUsers = await User.countDocuments();
         const totalTeachers = await User.countDocuments({ role: 'teacher' });
         const totalStudents = await User.countDocuments({ role: 'student' });
-        const totalCourses = await Course.countDocuments(); 
-        res.json({ totalUsers, totalTeachers, totalStudents, totalCourses }); 
+        const totalCourses = await Course.countDocuments(); // Fetch total courses
+        res.json({ totalUsers, totalTeachers, totalStudents, totalCourses }); // Include totalCourses
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
         res.status(500).json({ message: 'Failed to fetch dashboard data' });
@@ -25,7 +25,7 @@ router.get('/dashboard-data', async (req, res) => {
 
 router.get('/teachers', async (req, res) => {
     try {
-        const teachers = await User.find({ role: 'teacher' }).select('_id username email'); 
+        const teachers = await User.find({ role: 'teacher' }).select('_id username email'); // Select email too for lists
         res.json(teachers);
     } catch (error) {
         console.error('Error fetching teachers:', error);
@@ -33,9 +33,9 @@ router.get('/teachers', async (req, res) => {
     }
 });
 
-router.get('/students', async (req, res) => { 
+router.get('/students', async (req, res) => { // NEW ROUTE FOR STUDENTS LIST
     try {
-        const students = await User.find({ role: 'student' }).select('_id username email'); 
+        const students = await User.find({ role: 'student' }).select('_id username email'); // Select _id, username, email
         res.json(students);
     } catch (error) {
         console.error('Error fetching students:', error);
@@ -93,20 +93,47 @@ router.get('/enrollment-requests', async (req, res) => {
 router.put('/enrollment-requests/:requestId/approve', async (req, res) => {
     const { requestId } = req.params;
     try {
-        const request = await EnrollmentRequest.findByIdAndUpdate(
-            requestId,
-            { status: 'approved' },
-            { new: true }
-        );
+        const request = await EnrollmentRequest.findById(requestId);
         if (!request) {
             return res.status(404).json({ message: 'Enrollment request not found' });
         }
-        res.json({ message: 'Enrollment request approved' });
+
+        // 1. Add the student to the course's students array
+        await Course.findByIdAndUpdate(request.course, { $addToSet: { students: request.student } });
+        console.log(`Student ${request.student} added to course ${request.course}`);
+
+        // 2. Add the course to the student's courses array
+        await User.findByIdAndUpdate(request.student, { $addToSet: { courses: request.course } });
+        console.log(`Course ${request.course} added to student ${request.student}'s courses`);
+
+        // 3. Update the enrollment request status to approved
+        request.status = 'approved';
+        await request.save();
+        console.log(`Enrollment request ${requestId} status updated to approved`);
+
+        res.json({ message: 'Enrollment request approved and student enrolled' });
     } catch (error) {
         console.error('Error approving enrollment request:', error);
         res.status(500).json({ message: 'Failed to approve enrollment request' });
     }
 });
 
-module.exports = router;
+router.put('/enrollment-requests/:requestId/reject', async (req, res) => {
+    const { requestId } = req.params;
+    try {
+        const request = await EnrollmentRequest.findByIdAndUpdate(
+            requestId,
+            { status: 'rejected' },
+            { new: true }
+        );
+        if (!request) {
+            return res.status(404).json({ message: 'Enrollment request not found' });
+        }
+        res.json({ message: 'Enrollment request rejected' });
+    } catch (error) {
+        console.error('Error rejecting enrollment request:', error);
+        res.status(500).json({ message: 'Failed to reject enrollment request' });
+    }
+});
 
+module.exports = router;

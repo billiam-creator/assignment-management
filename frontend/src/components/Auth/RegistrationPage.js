@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './RegistrationPage.css';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -7,11 +7,15 @@ import 'react-toastify/dist/ReactToastify.css';
 function RegistrationPage() {
     const navigate = useNavigate();
     const [availableCourses, setAvailableCourses] = useState([]);
-    const [selectedCourses, setSelectedCourses] = useState([]); 
+    const [selectedCourses, setSelectedCourses] = useState([]);
+    const [registerAs, setRegisterAs] = useState('student'); // Default to student
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                
                 const response = await fetch('http://localhost:5000/api/courses');
                 if (response.ok) {
                     const data = await response.json();
@@ -37,21 +41,15 @@ function RegistrationPage() {
     const handleRegistration = async (e) => {
         e.preventDefault();
 
-        const username = e.target.username.value;
-        const email = e.target.email.value;
-        const password = e.target.password.value;
-        const registerAs = e.target.registerAs.value;
-
         const registrationData = {
             username: username,
             email: email,
             password: password,
             role: registerAs,
-            // Only include courses if the role is student
             ...(registerAs === 'student' && { courses: selectedCourses })
         };
 
-        console.log('Registration Data:', registrationData);
+        console.log('Registration Data being sent:', registrationData); // Detailed log
 
         try {
             const response = await fetch('http://localhost:5000/api/auth/register', {
@@ -63,14 +61,19 @@ function RegistrationPage() {
             });
 
             const data = await response.json();
+            console.log('Registration Response:', data); // Log the backend response
 
-            if (response.ok && data.message === 'User registered successfully!') {
+            if (response.ok && data.message === 'User registered successfully!' && data.role) {
                 toast.success('Registration successful!');
                 setTimeout(() => {
                     navigate('/'); 
                 }, 1500);
             } else {
                 toast.error(data.message || 'Registration failed');
+                if (data.errors) {
+                    console.error('Registration Errors from Backend:', data.errors);
+                    
+                }
             }
         } catch (error) {
             toast.error('Error during registration');
@@ -85,49 +88,53 @@ function RegistrationPage() {
                 <form onSubmit={handleRegistration}>
                     <div className="form-group">
                         <label htmlFor="username">Username</label>
-                        <input type="text" id="username" name="username" required />
+                        <input type="text" id="username" name="username" value={username} onChange={(e) => setUsername(e.target.value)} required />
                     </div>
                     <div className="form-group">
                         <label htmlFor="email">Email</label>
-                        <input type="email" id="email" name="email" required />
+                        <input type="email" id="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                     </div>
                     <div className="form-group">
                         <label htmlFor="password">Password</label>
-                        <input type="password" id="password" name="password" required />
+                        <input type="password" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                     </div>
                     <div className="form-group">
                         <label htmlFor="registerAs">Register as</label>
-                        <select id="registerAs" name="registerAs">
+                        <select
+                            id="registerAs"
+                            name="registerAs"
+                            value={registerAs}
+                            onChange={(e) => setRegisterAs(e.target.value)}
+                        >
                             <option value="student">Student</option>
                             <option value="teacher">Teacher</option>
                             <option value="admin">Admin</option>
                         </select>
                     </div>
-                    {/* Course Selection for Students */}
-                    <div className="form-group">
-                        <label htmlFor="courses">Select Courses (for Students)</label>
-                        <select
-                            id="courses"
-                            name="courses"
-                            multiple
-                            value={selectedCourses}
-                            onChange={handleCourseSelection}
-                            
-                            disabled={document.getElementById('registerAs')?.value !== 'student'}
-                        >
-                            {availableCourses.length > 0 ? (
-                                availableCourses.map(course => (
-                                    <option key={course._id} value={course._id}>{course.name}</option>
-                                ))
-                            ) : (
-                                <option value="" disabled>No courses available</option>
-                            )}
-                        </select>
-                    </div>
+                    {registerAs === 'student' && (
+                        <div className="form-group">
+                            <label htmlFor="courses">Select Courses (for Students)</label>
+                            <select
+                                id="courses"
+                                name="courses"
+                                multiple
+                                value={selectedCourses}
+                                onChange={handleCourseSelection}
+                            >
+                                {availableCourses.length > 0 ? (
+                                    availableCourses.map(course => (
+                                        <option key={course._id} value={course._id}>{course.name}</option>
+                                    ))
+                                ) : (
+                                    <option value="" disabled>No courses available</option>
+                                )}
+                            </select>
+                        </div>
+                    )}
                     <button type="submit" className="submit-button">Submit</button>
                 </form>
                 <div className="login-link">
-                    Already have an account? <a href="/">Login</a>
+                    Already have an account? <Link to="/">Login</Link>
                 </div>
             </div>
             <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
@@ -136,4 +143,3 @@ function RegistrationPage() {
 }
 
 export default RegistrationPage;
-

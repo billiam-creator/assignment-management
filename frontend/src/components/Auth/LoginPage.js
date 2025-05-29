@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './LoginPage.css';
@@ -6,14 +5,14 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage = () => {
-    const [identifier, setIdentifier] = useState(''); 
+    const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         const loginData = { identifier, password };
-        console.log('Login Data:', loginData);
+        console.log('Attempting Login with:', loginData);
 
         try {
             const response = await fetch('http://localhost:5000/api/auth/login', {
@@ -25,12 +24,15 @@ const LoginPage = () => {
             });
 
             const data = await response.json();
+            console.log('Login API Response:', data);
 
-            if (response.ok && data.token && data.role && data.message === 'Login successful!') {
-                toast.success('Login successful!');
-                localStorage.setItem('token', data.token); // Store the token
-                const userRole = data.role;
-                switch (userRole) {
+            if (response.ok && data.token && data.role) {
+                toast.success(data.message || 'Login successful!');
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('role', data.role);
+                localStorage.setItem('name', data.name || data.username); 
+
+                switch (data.role) {
                     case 'admin':
                         navigate('/admin/dashboard');
                         break;
@@ -41,16 +43,19 @@ const LoginPage = () => {
                         navigate('/student/dashboard');
                         break;
                     default:
-                        console.error('Unknown user role:', userRole);
-                        toast.error('Unknown user role');
-                        
+                        console.error('Unknown user role:', data.role);
+                        toast.error('Unknown user role. Please contact support.');
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('role');
+                        localStorage.removeItem('name');
+                        navigate('/'); // Redirect to login
                 }
-                console.log('Login Token:', data.token);
             } else {
                 toast.error(data.message || 'Login failed. Invalid credentials.');
             }
         } catch (error) {
-            toast.error('Error during login');
+            console.error('Error during login:', error);
+            toast.error('Network error during login. Please try again.');
         }
     };
 
@@ -59,7 +64,7 @@ const LoginPage = () => {
             <h1>Login</h1>
             <form onSubmit={handleLogin}>
                 <input
-                    type="text" 
+                    type="text"
                     placeholder="Username or Email"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}

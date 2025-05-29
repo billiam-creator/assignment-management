@@ -1,35 +1,56 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import RegistrationPage from './components/Auth/RegistrationPage';
 import LoginPage from './components/Auth/LoginPage';
-import ClassList from './components/Dashboard/Teacher/ClassList';
-import AssignmentList from './components/Dashboard/Teacher/AssignmentList';
-import SubmissionList from './components/Dashboard/Teacher/SubmissionList';
-import AssignmentResults from './components/Dashboard/Teacher/AssignmentResults';
-import StudentList from './components/Dashboard/Admin/StudentList';
-import TeacherList from './components/Dashboard/Admin/TeacherList';
-import Notification from './components/Notification/Notification';
-import SubmitAssignment from './components/Dashboard/SubmitAssignment';
 import AdminDashboard from './components/Dashboard/Admin/AdminDashboard';
 import StudentDashboard from './components/Dashboard/Student/StudentDashboard';
 import TeacherDashboard from './components/Dashboard/Teacher/TeacherDashboard';
-import CourseList from './components/Dashboard/Admin/CourseList';
+
+// Placeholder components for Admin Dashboard sections
+import UserManagement from './components/Dashboard/Admin/UserManagement';
+import EnrollmentRequests from './components/Dashboard/Admin/EnrollmentRequests';
+import CourseManagement from './components/Dashboard/Admin/CourseManagement';
+
+// Placeholder components for Student/Teacher specific pages
+import ViewAssignment from './components/Dashboard/Student/ViewAssignment'; // For students to view/submit assignments
+import SubmitAssignment from './components/Dashboard/Student/SubmitAssignment'; // For students to submit assignments
+import ViewSubmissions from './components/Dashboard/Teacher/ViewSubmissions'; // For teachers to view submissions
 
 function App() {
-  return (
-    <Router>
-      <div>
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/register" element={<RegistrationPage />} />
-          <Route path="/student/dashboard" element={<StudentDashboard />} />
-          <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        </Routes>
-      </div>
-    </Router>
-  );
-}
+    return (
+        <Router>
+            <div>
+                <Routes>
+                    {/* Public Routes */}
+                    <Route path="/" element={<LoginPage />} />
+                    <Route path="/register" element={<RegistrationPage />} />
 
+                    {/* Admin Dashboard Routes */}
+                    <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                    <Route path="/admin/user-management" element={<UserManagement />} />
+                    <Route path="/admin/enrollment-requests" element={<EnrollmentRequests />} />
+                    <Route path="/admin/course-management" element={<CourseManagement />} />
+
+                    {/* Student Dashboard Routes */}
+                    <Route path="/student/dashboard" element={<StudentDashboard />} />
+                    <Route path="/student/assignment/:assignmentId" element={<ViewAssignment />} />
+                    <Route path="/student/assignment/:assignmentId/submit" element={<SubmitAssignment />} />
+
+
+                    {/* Teacher Dashboard Routes */}
+                    <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
+                    {/* Teacher can view assignments for a course */}
+                    <Route path="/teacher/course/:courseId/assignments" element={<TeacherDashboard />} />
+                    {/* Teacher can view submissions for a specific assignment */}
+                    <Route path="/teacher/assignment/:assignmentId/submissions" element={<ViewSubmissions />} />
+
+
+                    {/* Fallback for unmatched routes - redirects to login */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+            </div>
+        </Router>
+    );
+}
 
 export default App;

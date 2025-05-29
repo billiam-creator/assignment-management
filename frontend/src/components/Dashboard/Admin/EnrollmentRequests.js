@@ -1,74 +1,92 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 
 function EnrollmentRequests() {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const authToken = localStorage.getItem('token');
     const API_BASE_URL = 'http://localhost:5000/api/admin';
+    const getAuthToken = useCallback(() => localStorage.getItem('token'), []);
 
-    const fetchEnrollmentRequests = async () => {
+    const fetchEnrollmentRequests = useCallback(async () => {
         setLoading(true);
         try {
+            const token = getAuthToken();
+            if (!token) {
+                toast.error('Authentication token missing. Please log in again.');
+                return;
+            }
             const response = await fetch(`${API_BASE_URL}/enrollment-requests`, {
-                headers: { 'Authorization': `Bearer ${authToken}` },
+                headers: { 'Authorization': `Bearer ${token}` },
             });
             if (response.ok) {
                 const data = await response.json();
                 setRequests(data);
             } else {
-                console.error('Failed to fetch enrollment requests:', response.status);
-                setError('Failed to fetch enrollment requests.');
-                toast.error('Failed to fetch enrollment requests.');
+                const errorData = await response.json();
+                throw new Error(errorData.message || `Failed to fetch requests: ${response.status}`);
             }
         } catch (err) {
             console.error('Error fetching enrollment requests:', err);
-            setError('Network error fetching enrollment requests.');
-            toast.error('Network error fetching enrollment requests.');
+            setError(err.message);
+            toast.error('Failed to load enrollment requests.');
         } finally {
             setLoading(false);
+        }
+    }, [API_BASE_URL, getAuthToken, toast]);
+
+    const handleApprove = async (requestId) => {
+        try {
+            const token = getAuthToken();
+            if (!token) return;
+            const response = await fetch(`${API_BASE_URL}/enrollment-requests/${requestId}/approve`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (response.ok) {
+                toast.success('Request approved!');
+                fetchEnrollmentRequests(); // Refresh list
+            } else {
+                const errorData = await response.json();
+                toast.error(errorData.message || 'Failed to approve request.');
+            }
+        } catch (error) {
+            console.error('Error approving request:', error);
+            toast.error('Network error approving request.');
+        }
+    };
+
+    const handleReject = async (requestId) => {
+        try {
+            const token = getAuthToken();
+            if (!token) return;
+            const response = await fetch(`${API_BASE_URL}/enrollment-requests/${requestId}/reject`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (response.ok) {
+                toast.success('Request rejected!');
+                fetchEnrollmentRequests(); // Refresh list
+            } else {
+                const errorData = await response.json();
+                toast.error(errorData.message || 'Failed to reject request.');
+            }
+        } catch (error) {
+            console.error('Error rejecting request:', error);
+            toast.error('Network error rejecting request.');
         }
     };
 
     useEffect(() => {
-        if (authToken) {
-            fetchEnrollmentRequests();
-        }
-    }, [authToken]);
+        fetchEnrollmentRequests();
+    }, [fetchEnrollmentRequests]);
 
-    const handleApprove = async (requestId) => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/enrollment-requests/${requestId}/approve`, {
-                method: 'PUT',
-                headers: { 'Authorization': `Bearer ${authToken}` },
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                toast.success(data.message || `Enrollment request ${requestId} approved!`);
-                fetchEnrollmentRequests();
-            } else {
-                const errorData = await response.json();
-                toast.error(errorData.message || `Failed to approve enrollment request ${requestId}.`);
-            }
-        } catch (err) {
-            console.error('Error approving request:', err);
-            toast.error('Network error approving enrollment.');
-        }
-    };
-
-    if (loading) {
-        return <p>Loading enrollment requests...</p>;
-    }
-
-    if (error) {
-        return <p>Error: {error}</p>;
-    }
+    if (loading) return <div>Loading enrollment requests...</div>;
+    if (error) return <div>Error: {error}</div>;
 
     return (
-        <div>
-            <h1>Enrollment Requests</h1>
+        <div className="enrollment-requests">
+            <h2>Enrollment Requests</h2>
             {requests.length > 0 ? (
                 <table>
                     <thead>
@@ -87,7 +105,10 @@ function EnrollmentRequests() {
                                 <td>{request.status}</td>
                                 <td>
                                     {request.status === 'pending' && (
-                                        <button className="action-button" onClick={() => handleApprove(request._id)}>Approve</button>
+                                        <>
+                                            <button onClick={() => handleApprove(request._id)}>Approve</button>
+                                            <button onClick={() => handleReject(request._id)}>Reject</button>
+                                        </>
                                     )}
                                 </td>
                             </tr>

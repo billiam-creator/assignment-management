@@ -1,54 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 
 function CourseManagement() {
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const authToken = localStorage.getItem('token');
     const API_BASE_URL = 'http://localhost:5000/api/admin';
+    const getAuthToken = useCallback(() => localStorage.getItem('token'), []);
 
-    const fetchCourses = async () => {
+    const fetchCourses = useCallback(async () => {
         setLoading(true);
         try {
+            const token = getAuthToken();
+            if (!token) {
+                toast.error('Authentication token missing. Please log in again.');
+                return;
+            }
             const response = await fetch(`${API_BASE_URL}/courses`, {
-                headers: { 'Authorization': `Bearer ${authToken}` },
+                headers: { 'Authorization': `Bearer ${token}` },
             });
             if (response.ok) {
                 const data = await response.json();
                 setCourses(data);
             } else {
-                console.error('Failed to fetch courses:', response.status);
-                setError('Failed to fetch courses.');
-                toast.error('Failed to fetch courses.');
+                const errorData = await response.json();
+                throw new Error(errorData.message || `Failed to fetch courses: ${response.status}`);
             }
         } catch (err) {
             console.error('Error fetching courses:', err);
-            setError('Network error fetching courses.');
-            toast.error('Network error fetching courses.');
+            setError(err.message);
+            toast.error('Failed to load courses.');
         } finally {
             setLoading(false);
         }
-    };
+    }, [API_BASE_URL, getAuthToken, toast]);
 
     useEffect(() => {
-        if (authToken) {
-            fetchCourses();
-        }
-    }, [authToken]);
+        fetchCourses();
+    }, [fetchCourses]);
 
-    if (loading) {
-        return <p>Loading courses...</p>;
-    }
-
-    if (error) {
-        return <p>Error: {error}</p>;
-    }
+    if (loading) return <div>Loading courses...</div>;
+    if (error) return <div>Error: {error}</div>;
 
     return (
-        <div>
-            <h1>Course Management</h1>
-            <h2>Existing Courses</h2>
+        <div className="course-management">
+            <h2>Course Management</h2>
             {courses.length > 0 ? (
                 <table>
                     <thead>
@@ -59,25 +55,24 @@ function CourseManagement() {
                         </tr>
                     </thead>
                     <tbody>
-                        {courses.map((course) => (
+                        {courses.map(course => (
                             <tr key={course._id}>
                                 <td>{course.name}</td>
                                 <td>{course.instructor ? course.instructor.username : 'N/A'}</td>
                                 <td>
-                                    {/* Add Edit/Delete buttons here */}
-                                    <button className="action-button edit-button">Edit</button>
-                                    <button className="action-button delete-button">Delete</button>
+                                    {/* Add buttons for Edit/Delete Course */}
+                                    <button>Edit</button>
+                                    <button>Delete</button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             ) : (
-                <p>No courses available.</p>
+                <p>No courses found.</p>
             )}
         </div>
     );
 }
 
 export default CourseManagement;
-
