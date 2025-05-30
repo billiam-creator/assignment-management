@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify'; // Ensure toast is imported
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './StudentDashboard.css';
+import './StudentDashboard.css'; // Ensure this CSS file is linked
 
 function StudentDashboard() {
     const navigate = useNavigate();
-    const [studentInfo, setStudentInfo] = useState(null); // Initialize as null
+    const [studentInfo, setStudentInfo] = useState(null);
     const [enrolledCourses, setEnrolledCourses] = useState([]);
     const [courseRequests, setCourseRequests] = useState([]);
     const [assignments, setAssignments] = useState([]);
@@ -22,9 +22,10 @@ function StudentDashboard() {
         localStorage.removeItem('token');
         localStorage.removeItem('role');
         localStorage.removeItem('name');
-        navigate('/'); // Redirect to the login page (root)
+        navigate('/');
     }, [navigate]);
 
+    // Removed 'toast' from dependencies
     const fetchStudentData = useCallback(async () => {
         setLoadingInfo(true);
         try {
@@ -39,7 +40,6 @@ function StudentDashboard() {
             if (response.ok) {
                 const data = await response.json();
                 setStudentInfo(data);
-                // The backend /info route now directly returns only approved courses
                 setEnrolledCourses(data.enrolledCourses || []);
             } else {
                 console.error('Failed to fetch student info:', response.status);
@@ -54,8 +54,9 @@ function StudentDashboard() {
         } finally {
             setLoadingInfo(false);
         }
-    }, [API_BASE_URL, getAuthToken, handleLogout, setStudentInfo, setEnrolledCourses]); // Removed toast from dependencies
+    }, [API_BASE_URL, getAuthToken, handleLogout, setStudentInfo, setEnrolledCourses]);
 
+    // Removed 'toast' from dependencies
     const fetchCourseRequests = useCallback(async () => {
         setLoadingRequests(true);
         try {
@@ -83,8 +84,9 @@ function StudentDashboard() {
         } finally {
             setLoadingRequests(false);
         }
-    }, [API_BASE_URL, getAuthToken, handleLogout, setCourseRequests]); // Removed toast from dependencies
+    }, [API_BASE_URL, getAuthToken, handleLogout, setCourseRequests]);
 
+    // Removed 'toast' from dependencies
     const fetchAssignments = useCallback(async () => {
         setLoadingAssignments(true);
         try {
@@ -112,12 +114,12 @@ function StudentDashboard() {
         } finally {
             setLoadingAssignments(false);
         }
-    }, [API_BASE_URL, getAuthToken, handleLogout, setAssignments]); // Removed toast from dependencies
+    }, [API_BASE_URL, getAuthToken, handleLogout, setAssignments]);
 
     useEffect(() => {
         const userRole = localStorage.getItem('role');
         if (userRole !== 'student') {
-            navigate('/'); // Redirect if not a student
+            navigate('/');
             return;
         }
         fetchStudentData();
@@ -136,7 +138,6 @@ function StudentDashboard() {
                 <nav>
                     <ul>
                         <li><Link to="/student/dashboard" className="active">Dashboard</Link></li>
-                        {/* You can make these sidebar items navigate to different sections/components if you create them */}
                         <li><Link to="/student/my-info">My Information</Link></li>
                         <li><Link to="/student/enrolled-courses">Enrolled Courses</Link></li>
                         <li><Link to="/student/my-requests">My Course Requests</Link></li>
@@ -165,7 +166,11 @@ function StudentDashboard() {
                             <div className="course-list">
                                 {enrolledCourses.map((course) => (
                                     <div key={course.id} className="course-item">
-                                        <Link to={`/student/course/${course.id}`}>{course.name}</Link>
+                                        <Link to={`/student/course/${course.id}`}>
+                                            <h4>{course.name}</h4>
+                                            <p>Instructor: {course.instructor ? course.instructor.username : 'N/A'}</p>
+                                            {/* Add more course details if available, e.g., <p>{course.description}</p> */}
+                                        </Link>
                                     </div>
                                 ))}
                             </div>

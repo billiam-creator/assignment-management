@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './TeacherDashboard.css';
+import './TeacherDashboard.css'; // Ensure this CSS file is linked
 
 function TeacherDashboard() {
     const navigate = useNavigate();
@@ -33,6 +33,7 @@ function TeacherDashboard() {
     }, [navigate]);
 
     // Define fetchAssignmentsForCourse BEFORE fetchMyCourses to avoid initialization error
+    // Removed 'toast' from dependencies
     const fetchAssignmentsForCourse = useCallback(async (courseId) => {
         if (!courseId) {
             setAssignmentsInSelectedCourse([]);
@@ -64,8 +65,9 @@ function TeacherDashboard() {
         } finally {
             setLoadingAssignments(false);
         }
-    }, [API_BASE_URL, getAuthToken, handleLogout, setAssignmentsInSelectedCourse]); // Removed toast from dependencies
+    }, [API_BASE_URL, getAuthToken, handleLogout, setAssignmentsInSelectedCourse]);
 
+    // Removed 'toast' from dependencies
     const fetchTeacherInfo = useCallback(async () => {
         setLoadingInfo(true);
         try {
@@ -93,8 +95,9 @@ function TeacherDashboard() {
         } finally {
             setLoadingInfo(false);
         }
-    }, [API_BASE_URL, getAuthToken, handleLogout, setTeacherInfo]); // Removed toast from dependencies
+    }, [API_BASE_URL, getAuthToken, handleLogout, setTeacherInfo]);
 
+    // Removed 'toast' from dependencies
     const fetchMyCourses = useCallback(async () => {
         setLoadingCourses(true);
         try {
@@ -130,7 +133,7 @@ function TeacherDashboard() {
         } finally {
             setLoadingCourses(false);
         }
-    }, [API_BASE_URL, getAuthToken, handleLogout, setMyCourses, setSelectedCourseId, setStudentsInSelectedCourse, fetchAssignmentsForCourse]); // Removed toast from dependencies
+    }, [API_BASE_URL, getAuthToken, handleLogout, setMyCourses, setSelectedCourseId, setStudentsInSelectedCourse, fetchAssignmentsForCourse]);
 
     const handleCourseSelect = useCallback((event) => {
         const courseId = event.target.value;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import './RegistrationPage.css';
+import './RegistrationPage.css'; // Ensure this CSS file is linked
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -49,7 +49,7 @@ function RegistrationPage() {
             ...(registerAs === 'student' && { courses: selectedCourses })
         };
 
-        console.log('Registration Data being sent:', registrationData); // Detailed log
+        console.log('Registration Data being sent:', registrationData);
 
         try {
             const response = await fetch('http://localhost:5000/api/auth/register', {
@@ -61,18 +61,17 @@ function RegistrationPage() {
             });
 
             const data = await response.json();
-            console.log('Registration Response:', data); // Log the backend response
+            console.log('Registration Response:', data);
 
             if (response.ok && data.message === 'User registered successfully!' && data.role) {
                 toast.success('Registration successful!');
                 setTimeout(() => {
-                    navigate('/'); 
+                    navigate('/'); // Redirect to login after registration
                 }, 1500);
             } else {
                 toast.error(data.message || 'Registration failed');
                 if (data.errors) {
                     console.error('Registration Errors from Backend:', data.errors);
-                    
                 }
             }
         } catch (error) {

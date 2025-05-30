@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './AdminDashboard.css';
+import './AdminDashboard.css'; // Ensure this CSS file is linked
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -24,7 +24,7 @@ function AdminDashboard() {
     const [teachersListForCourseDropdown, setTeachersListForCourseDropdown] = useState([]);
     const [addCourseLoading, setAddCourseLoading] = useState(false);
 
-    const API_BASE_URL = 'http://localhost:5000/api/admin';
+    const API_BASE_URL = 'http://localhost:5000/api/admin'; // Ensure this is correct
 
     const handleLogout = useCallback(() => {
         localStorage.removeItem('token');
@@ -33,6 +33,7 @@ function AdminDashboard() {
         navigate('/'); // Redirect to the login page (root)
     }, [navigate]);
 
+    // Removed 'toast' from dependencies as it's an outer scope value and doesn't trigger re-renders
     const fetchDashboardData = useCallback(async (token) => {
         try {
             const response = await fetch(`${API_BASE_URL}/dashboard-data`, {
@@ -55,8 +56,9 @@ function AdminDashboard() {
             console.error('Error fetching dashboard data:', error);
             toast.error('Network error fetching dashboard data.');
         }
-    }, [API_BASE_URL, handleLogout, setTotalCoursesOverview, setTotalStudentsOverview, setTotalTeachersOverview, setTotalUsers, toast]);
+    }, [API_BASE_URL, handleLogout, setTotalCoursesOverview, setTotalStudentsOverview, setTotalTeachersOverview, setTotalUsers]);
 
+    // Removed 'toast' from dependencies
     const fetchTeachersForCourseDropdown = useCallback(async (token) => {
         try {
             const response = await fetch(`${API_BASE_URL}/teachers`, {
@@ -76,7 +78,7 @@ function AdminDashboard() {
             console.error('Error fetching teachers for dropdown:', error);
             toast.error('Network error fetching teachers for course assignment.');
         }
-    }, [API_BASE_URL, handleLogout, setTeachersListForCourseDropdown, toast]);
+    }, [API_BASE_URL, handleLogout, setTeachersListForCourseDropdown]);
 
     const handleAddCourse = async () => {
         if (!newCourseName || !selectedInstructor) {

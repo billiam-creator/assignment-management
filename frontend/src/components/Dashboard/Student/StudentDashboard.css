@@ -1,3 +1,4 @@
+/* Base styles for Student Dashboard */
 .student-dashboard-container {
   display: flex;
   min-height: 100vh;
@@ -130,6 +131,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-direction: column; /* Stack course details vertically */
+  align-items: flex-start; /* Align text to the left */
 }
 
 .course-list .course-item a,
@@ -138,7 +141,21 @@
   color: #2c3e50;
   font-weight: bold;
   flex-grow: 1;
+  width: 100%; /* Take full width */
 }
+
+.course-list .course-item h4 {
+  margin: 0 0 5px 0;
+  font-size: 1.1em;
+  color: #3498db;
+}
+
+.course-list .course-item p {
+  margin: 0;
+  font-size: 0.9em;
+  color: #666;
+}
+
 
 .course-list .course-item a:hover,
 .assignment-list li a:hover {
@@ -185,38 +202,46 @@
   font-weight: bold;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* --- Responsive Adjustments --- */
+
+/* For screens smaller than 992px (e.g., tablets) */
+@media (max-width: 991px) {
   .student-dashboard-container {
-      flex-direction: column;
+      flex-direction: column; /* Stack sidebar and content vertically */
   }
 
   .sidebar {
-      width: 100%;
+      width: 100%; /* Full width for sidebar */
       padding: 15px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      flex-direction: row; /* Make sidebar items horizontal */
+      justify-content: center; /* Center nav items */
+      flex-wrap: wrap; /* Allow nav items to wrap */
   }
 
   .sidebar h2 {
-      margin-bottom: 20px;
+      display: none; /* Hide portal title on small screens */
   }
 
   .sidebar nav ul {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
+      width: 100%;
   }
 
   .sidebar nav ul li {
-      margin: 5px;
+      margin: 5px 10px; /* Adjust spacing for horizontal items */
+      padding: 8px 12px; /* Smaller padding */
+      font-size: 0.95em; /* Smaller font */
   }
 
   .content {
-      padding: 20px;
+      padding: 20px; /* Reduce content padding */
   }
 
   .header {
-      flex-direction: column;
+      flex-direction: column; /* Stack header items */
       align-items: flex-start;
       padding: 20px;
   }
@@ -227,6 +252,65 @@
   }
 
   .dashboard-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Adjust card sizing */
+      gap: 20px;
+  }
+
+  .card h3 {
+      font-size: 1.3em;
+  }
+
+  .info-card p {
+      font-size: 0.95em;
+  }
+
+  .data-table th, .data-table td {
+      padding: 8px;
+      font-size: 0.9em;
+  }
+}
+
+/* For screens smaller than 576px (e.g., mobile phones) */
+@media (max-width: 575px) {
+  .sidebar nav ul li {
+      width: calc(50% - 20px); /* Two items per row */
+      text-align: center;
+  }
+
+  .dashboard-grid {
+      grid-template-columns: 1fr; /* Stack cards vertically */
+  }
+
+  .content {
+      padding: 15px;
+  }
+
+  .header h1 {
+      font-size: 1.5em;
+  }
+
+  .header p {
+      font-size: 1em;
+  }
+
+  .card h3 {
+      font-size: 1.2em;
+  }
+
+  .info-card p {
+      font-size: 0.9em;
+  }
+
+  .course-list .course-item,
+  .assignment-list li {
+      padding: 8px 10px;
+  }
+
+  .course-list .course-item h4 {
+      font-size: 1em;
+  }
+
+  .course-list .course-item p {
+      font-size: 0.8em;
   }
 }

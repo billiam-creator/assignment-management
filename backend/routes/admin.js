@@ -1,3 +1,4 @@
+// backend/routes/admin.js
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
@@ -6,7 +7,7 @@ const EnrollmentRequest = require('../models/EnrollmentRequest');
 const requireAuth = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
 
-// Apply auth and isAdmin middleware to all routes in this router
+// Apply auth and isAdmin middleware to ALL routes defined in this router
 router.use(requireAuth);
 router.use(isAdmin);
 
