@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './AdminDashboard.css'; // Ensure this CSS file is linked
+import './AdminDashboard.css'; 
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Placeholder components - you will need to implement these fully
+
 import UserManagement from './UserManagement';
 import EnrollmentRequests from './EnrollmentRequests';
 import CourseManagement from './CourseManagement';
@@ -24,16 +24,16 @@ function AdminDashboard() {
     const [teachersListForCourseDropdown, setTeachersListForCourseDropdown] = useState([]);
     const [addCourseLoading, setAddCourseLoading] = useState(false);
 
-    const API_BASE_URL = 'http://localhost:5000/api/admin'; // Ensure this is correct
+    const API_BASE_URL = 'http://localhost:5000/api/admin'; 
 
     const handleLogout = useCallback(() => {
         localStorage.removeItem('token');
         localStorage.removeItem('role');
         localStorage.removeItem('name');
-        navigate('/'); // Redirect to the login page (root)
+        navigate('/'); 
     }, [navigate]);
 
-    // Removed 'toast' from dependencies as it's an outer scope value and doesn't trigger re-renders
+   
     const fetchDashboardData = useCallback(async (token) => {
         try {
             const response = await fetch(`${API_BASE_URL}/dashboard-data`, {
@@ -48,7 +48,7 @@ function AdminDashboard() {
             } else {
                 console.error('Failed to fetch dashboard data:', response.status);
                 toast.error('Failed to fetch dashboard data.');
-                if (response.status === 401 || response.status === 403) { // Handle 401/403 for auth/role
+                if (response.status === 401 || response.status === 403) { 
                     handleLogout();
                 }
             }
@@ -58,7 +58,7 @@ function AdminDashboard() {
         }
     }, [API_BASE_URL, handleLogout, setTotalCoursesOverview, setTotalStudentsOverview, setTotalTeachersOverview, setTotalUsers]);
 
-    // Removed 'toast' from dependencies
+   
     const fetchTeachersForCourseDropdown = useCallback(async (token) => {
         try {
             const response = await fetch(`${API_BASE_URL}/teachers`, {
@@ -106,7 +106,7 @@ function AdminDashboard() {
                 toast.success(data.message || 'Course added successfully!');
                 setNewCourseName('');
                 setSelectedInstructor('');
-                fetchDashboardData(authToken); // Refresh overview data
+                fetchDashboardData(authToken); 
             } else {
                 const errorData = await response.json();
                 toast.error(errorData.message || 'Failed to add course.');
@@ -127,7 +127,7 @@ function AdminDashboard() {
         const userRole = localStorage.getItem('role');
 
         if (!tokenFromStorage || userRole !== 'admin') {
-            navigate('/'); // Redirect to login if not authenticated or not admin
+            navigate('/'); 
             return;
         }
         setAuthToken(tokenFromStorage);
