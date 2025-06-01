@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import './RegistrationPage.css'; // Ensure this CSS file is linked
+import './RegistrationPage.css';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -8,10 +8,11 @@ function RegistrationPage() {
     const navigate = useNavigate();
     const [availableCourses, setAvailableCourses] = useState([]);
     const [selectedCourses, setSelectedCourses] = useState([]);
-    const [registerAs, setRegisterAs] = useState('student'); // Default to student
+    const [registerAs, setRegisterAs] = useState('student');
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [passwordError, setPasswordError] = useState(''); // New state for password error
 
     useEffect(() => {
         const fetchCourses = async () => {
@@ -40,6 +41,12 @@ function RegistrationPage() {
 
     const handleRegistration = async (e) => {
         e.preventDefault();
+        setPasswordError(''); // Clear any previous password error
+
+        if (password.length < 6) {
+            setPasswordError('Password must be at least 6 characters long.');
+            return;
+        }
 
         const registrationData = {
             username: username,
@@ -96,6 +103,7 @@ function RegistrationPage() {
                     <div className="form-group">
                         <label htmlFor="password">Password</label>
                         <input type="password" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                        {passwordError && <p className="error-message">{passwordError}</p>} {/* Display password error */}
                     </div>
                     <div className="form-group">
                         <label htmlFor="registerAs">Register as</label>
