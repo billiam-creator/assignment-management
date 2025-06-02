@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './TeacherDashboard.css'; // Ensure this CSS file is linked
+import './TeacherDashboard.css';
 
 function TeacherDashboard() {
     const navigate = useNavigate();
@@ -32,8 +32,7 @@ function TeacherDashboard() {
         navigate('/');
     }, [navigate]);
 
-    // Define fetchAssignmentsForCourse BEFORE fetchMyCourses to avoid initialization error
-    // Removed 'toast' from dependencies
+
     const fetchAssignmentsForCourse = useCallback(async (courseId) => {
         if (!courseId) {
             setAssignmentsInSelectedCourse([]);
@@ -67,7 +66,7 @@ function TeacherDashboard() {
         }
     }, [API_BASE_URL, getAuthToken, handleLogout, setAssignmentsInSelectedCourse]);
 
-    // Removed 'toast' from dependencies
+
     const fetchTeacherInfo = useCallback(async () => {
         setLoadingInfo(true);
         try {
@@ -97,7 +96,7 @@ function TeacherDashboard() {
         }
     }, [API_BASE_URL, getAuthToken, handleLogout, setTeacherInfo]);
 
-    // Removed 'toast' from dependencies
+
     const fetchMyCourses = useCallback(async () => {
         setLoadingCourses(true);
         try {
@@ -113,12 +112,12 @@ function TeacherDashboard() {
                 const data = await response.json();
                 setMyCourses(data);
                 // If there's only one course, select it by default and load its students/assignments
-                if (data.length > 0) { // Changed from === 1 to > 0 to handle cases with multiple courses
+                if (data.length > 0) { 
                     const firstCourseId = data[0]._id;
                     setSelectedCourseId(firstCourseId);
                     setStudentsInSelectedCourse(data[0].enrolledStudents || []);
                     // Automatically fetch assignments for the first course
-                    fetchAssignmentsForCourse(firstCourseId); // This call is now safe due to reordering
+                    fetchAssignmentsForCourse(firstCourseId); 
                 }
             } else {
                 console.error('Failed to fetch teacher\'s courses:', response.status);
@@ -141,7 +140,7 @@ function TeacherDashboard() {
         const selectedCourse = myCourses.find(course => course._id === courseId);
         setStudentsInSelectedCourse(selectedCourse?.enrolledStudents || []);
         fetchAssignmentsForCourse(courseId);
-        setIsAddingAssignment(false); // Hide assignment form when course changes
+        setIsAddingAssignment(false); 
     }, [myCourses, fetchAssignmentsForCourse]);
 
     const handleCreateAssignment = async () => {
@@ -202,7 +201,7 @@ function TeacherDashboard() {
         fetchMyCourses();
     }, [navigate, fetchTeacherInfo, fetchMyCourses]);
 
-    // This effect runs when selectedCourseId changes to fetch assignments for it
+
     useEffect(() => {
         if (selectedCourseId) {
             fetchAssignmentsForCourse(selectedCourseId);

@@ -60,7 +60,7 @@ function CourseManagement() {
                                 <td>{course.name}</td>
                                 <td>{course.instructor ? course.instructor.username : 'N/A'}</td>
                                 <td>
-                                    {/* Add buttons for Edit/Delete Course */}
+                                    {}
                                     <button>Edit</button>
                                     <button>Delete</button>
                                 </td>

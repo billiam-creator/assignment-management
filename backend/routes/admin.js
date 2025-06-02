@@ -1,4 +1,4 @@
-// backend/routes/admin.js
+
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
@@ -7,7 +7,7 @@ const EnrollmentRequest = require('../models/EnrollmentRequest');
 const requireAuth = require('../middleware/auth');
 const isAdmin = require('../middleware/isAdmin');
 
-// Apply auth and isAdmin middleware to ALL routes defined in this router
+
 router.use(requireAuth);
 router.use(isAdmin);
 
@@ -16,8 +16,8 @@ router.get('/dashboard-data', async (req, res) => {
         const totalUsers = await User.countDocuments();
         const totalTeachers = await User.countDocuments({ role: 'teacher' });
         const totalStudents = await User.countDocuments({ role: 'student' });
-        const totalCourses = await Course.countDocuments(); // Fetch total courses
-        res.json({ totalUsers, totalTeachers, totalStudents, totalCourses }); // Include totalCourses
+        const totalCourses = await Course.countDocuments(); 
+        res.json({ totalUsers, totalTeachers, totalStudents, totalCourses });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
         res.status(500).json({ message: 'Failed to fetch dashboard data' });
@@ -26,7 +26,7 @@ router.get('/dashboard-data', async (req, res) => {
 
 router.get('/teachers', async (req, res) => {
     try {
-        const teachers = await User.find({ role: 'teacher' }).select('_id username email'); // Select email too for lists
+        const teachers = await User.find({ role: 'teacher' }).select('_id username email'); 
         res.json(teachers);
     } catch (error) {
         console.error('Error fetching teachers:', error);
@@ -34,7 +34,7 @@ router.get('/teachers', async (req, res) => {
     }
 });
 
-router.get('/students', async (req, res) => { // NEW ROUTE FOR STUDENTS LIST
+router.get('/students', async (req, res) => { 
     try {
         const students = await User.find({ role: 'student' }).select('_id username email'); // Select _id, username, email
         res.json(students);
@@ -44,9 +44,9 @@ router.get('/students', async (req, res) => { // NEW ROUTE FOR STUDENTS LIST
     }
 });
 
-router.get('/users', async (req, res) => { // Route for UserManagement component (all users)
+router.get('/users', async (req, res) => { 
     try {
-        const users = await User.find().select('-password'); // Fetch all users, exclude password
+        const users = await User.find().select('-password'); 
         res.json(users);
     } catch (error) {
         console.error('Error fetching all users:', error);
@@ -66,7 +66,7 @@ router.get('/courses', async (req, res) => {
 
 router.post('/courses', async (req, res) => {
     const { name, instructorId } = req.body;
-    if (!name || !instructorId) { // Ensure instructorId is also checked
+    if (!name || !instructorId) { 
         return res.status(400).json({ message: 'Course name and instructor are required' });
     }
     try {

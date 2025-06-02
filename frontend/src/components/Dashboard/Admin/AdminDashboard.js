@@ -85,7 +85,7 @@ function AdminDashboard() {
             toast.warn('Please enter course name and select an instructor.');
             return;
         }
-        if (!authToken) { // Ensure token exists before attempting to add course
+        if (!authToken) { 
             handleLogout();
             return;
         }

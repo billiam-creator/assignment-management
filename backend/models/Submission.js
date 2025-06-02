@@ -15,7 +15,7 @@ const SubmissionSchema = new mongoose.Schema({
         type: String,
         required: false, // Can be text or file
     },
-    submissionFileUrl: { // For file uploads (e.g., S3 URL)
+    submissionFileUrl: { 
         type: String,
         required: false,
     },

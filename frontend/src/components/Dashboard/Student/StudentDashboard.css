@@ -54,7 +54,7 @@
   cursor: pointer;
   position: relative;
   z-index: 1;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, background-color 0.3s ease; /* Added background-color transition */
 }
 
 .sidebar nav ul li::before {
@@ -84,6 +84,13 @@
   background-color: #3498db;
   font-weight: bold;
   color: #ffffff;
+}
+
+/* Style for the active navigation link */
+.sidebar nav ul li.active-card-nav {
+  background-color: #3498db;
+  color: #ffffff;
+  font-weight: bold;
 }
 
 .content {
@@ -135,7 +142,7 @@
   justify-content: space-between;
   opacity: 0;
   transform: scale(0.95);
-  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out, background-color 0.3s ease; /* Added background-color transition */
   animation: fadeInUp 0.4s ease-out forwards; /* Fade and slide up animation */
 }
 
@@ -154,6 +161,13 @@
 .card:hover {
   transform: scale(1.01);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Style for the active card */
+.card.active-card {
+  background-color: #e0f7fa; /* A light cyan-like color, change as desired */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transform: scale(1.01);
 }
 
 .card h3 {

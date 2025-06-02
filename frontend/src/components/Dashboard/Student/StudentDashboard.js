@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './StudentDashboard.css'; // Ensure this CSS file is linked
+import './StudentDashboard.css';
 
 function StudentDashboard() {
     const navigate = useNavigate();
+    const location = useLocation();
+
     const [studentInfo, setStudentInfo] = useState(null);
     const [enrolledCourses, setEnrolledCourses] = useState([]);
     const [courseRequests, setCourseRequests] = useState([]);
     const [assignments, setAssignments] = useState([]);
+    const [activeCard, setActiveCard] = useState(null); // State to track the active card
 
     const [loadingInfo, setLoadingInfo] = useState(true);
     const [loadingRequests, setLoadingRequests] = useState(true);
@@ -128,17 +131,22 @@ function StudentDashboard() {
         return <div className="dashboard-loading">Loading student dashboard...</div>;
     }
 
+    const handleNavLinkClick = (cardId) => {
+        setActiveCard(cardId);
+        
+    };
+
     return (
         <div className="student-dashboard-container">
             <div className="sidebar">
                 <h2>Student Portal</h2>
                 <nav>
                     <ul>
-                        <li><Link to="/student/dashboard" className="active">Dashboard</Link></li>
-                        <li><Link to="/student/my-info">My Information</Link></li>
-                        <li><Link to="/student/enrolled-courses">Enrolled Courses</Link></li>
-                        <li><Link to="/student/my-requests">My Course Requests</Link></li>
-                        <li><Link to="/student/my-assignments">Assignments</Link></li>
+                        <li onClick={() => handleNavLinkClick('dashboard')} className={activeCard === 'dashboard' ? 'active-card-nav' : ''}>Dashboard</li>
+                        <li onClick={() => handleNavLinkClick('my-info')} className={activeCard === 'my-info' ? 'active-card-nav' : ''}>My Information</li>
+                        <li onClick={() => handleNavLinkClick('enrolled-courses')} className={activeCard === 'enrolled-courses' ? 'active-card-nav' : ''}>Enrolled Courses</li>
+                        <li onClick={() => handleNavLinkClick('my-requests')} className={activeCard === 'my-requests' ? 'active-card-nav' : ''}>My Course Requests</li>
+                        <li onClick={() => handleNavLinkClick('assignments')} className={activeCard === 'assignments' ? 'active-card-nav' : ''}>Assignments</li>
                         <li onClick={handleLogout} style={{ cursor: 'pointer' }}>Logout</li>
                     </ul>
                 </nav>
@@ -150,14 +158,14 @@ function StudentDashboard() {
                 </div>
 
                 <div className="dashboard-grid">
-                    <div className="info-card card">
+                    <div className={`info-card card ${activeCard === 'my-info' ? 'active-card' : ''}`}>
                         <h3>My Information</h3>
                         <p>Name: {studentInfo?.name || studentInfo?.username || 'N/A'}</p>
                         <p>Major: {studentInfo?.major || 'N/A'}</p>
                         <p>Email: {studentInfo?.email || 'N/A'}</p>
                     </div>
 
-                    <div className="courses-card card">
+                    <div className={`courses-card card ${activeCard === 'enrolled-courses' ? 'active-card' : ''}`}>
                         <h3>Enrolled Courses</h3>
                         {enrolledCourses.length > 0 ? (
                             <div className="course-list">
@@ -165,8 +173,7 @@ function StudentDashboard() {
                                     <div key={course.id} className="course-item">
                                         <Link to={`/student/course/${course.id}`}>
                                             <h4>{course.name}</h4>
-                                            <p>Instructor: {course.instructor ? course.instructor.username : 'N/A'}</p>
-                                            {/* Add more course details if available, e.g., <p>{course.description}</p> */}
+                                            <p>Instructor: {course.instructor ? course.instructor.name : 'N/A'}</p>
                                         </Link>
                                     </div>
                                 ))}
@@ -176,7 +183,7 @@ function StudentDashboard() {
                         )}
                     </div>
 
-                    <div className="requests-card card">
+                    <div className={`requests-card card ${activeCard === 'my-requests' ? 'active-card' : ''}`}>
                         <h3>My Course Requests</h3>
                         {courseRequests.length > 0 ? (
                             <table className="data-table">
@@ -200,7 +207,7 @@ function StudentDashboard() {
                         )}
                     </div>
 
-                    <div className="assignments-card card">
+                    <div className={`assignments-card card ${activeCard === 'assignments' ? 'active-card' : ''}`}>
                         <h3>Assignments</h3>
                         {assignments.length > 0 ? (
                             <div className="assignment-list">

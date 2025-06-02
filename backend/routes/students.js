@@ -4,34 +4,30 @@ const Assignment = require('../models/Assignment');
 const Submission = require('../models/Submission');
 const User = require('../models/User');
 const EnrollmentRequest = require('../models/EnrollmentRequest');
-const Course = require('../models/Course'); 
+const Course = require('../models/Course');
 const requireAuth = require('../middleware/auth');
 const isStudent = require('../middleware/isStudent');
-
 
 router.use(requireAuth);
 router.use(isStudent);
 
-
 router.get('/info', async (req, res) => {
     try {
-
         const student = await User.findById(req.user.id)
-                                  .select('username name email major courses')
-                                  .populate({
-                                      path: 'courses',
-                                      select: 'name description instructor', 
-                                      populate: {
-                                          path: 'instructor',
-                                          select: 'username' 
-                                      }
-                                  });
+            .select('username name email major courses')
+            .populate({
+                path: 'courses',
+                select: 'name description instructor',
+                populate: {
+                    path: 'instructor',
+                    select: 'username name' // Added 'name' here
+                }
+            });
 
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
 
-        
         res.json({
             _id: student._id,
             username: student.username,
@@ -41,8 +37,11 @@ router.get('/info', async (req, res) => {
             enrolledCourses: student.courses.map(course => ({
                 id: course._id,
                 name: course.name,
-                description: course.description, 
-                instructor: course.instructor ? course.instructor.username : 'N/A' // Include instructor username
+                description: course.description,
+                instructor: course.instructor ? {
+                    username: course.instructor.username,
+                    name: course.instructor.name // Now the name will be available
+                } : null // Changed 'N/A' to null for better data structure
             }))
         });
 
@@ -52,11 +51,10 @@ router.get('/info', async (req, res) => {
     }
 });
 
-
 router.get('/course-requests', async (req, res) => {
     try {
         const requests = await EnrollmentRequest.find({ student: req.user.id })
-            .populate('course', 'name _id') 
+            .populate('course', 'name _id')
             .select('course status');
         res.json(requests);
     } catch (error) {
@@ -80,14 +78,13 @@ router.get('/assignments', async (req, res) => {
     }
 });
 
-
 router.get('/assignments/:assignmentId', async (req, res) => {
     try {
         const assignment = await Assignment.findById(req.params.assignmentId).populate('course', 'name');
         if (!assignment) {
             return res.status(404).json({ message: 'Assignment not found' });
         }
-        
+
         const student = await User.findById(req.user.id).select('courses');
         if (!student || !student.courses.includes(assignment.course._id)) {
             return res.status(403).json({ message: 'Unauthorized to access this assignment' });
@@ -99,7 +96,6 @@ router.get('/assignments/:assignmentId', async (req, res) => {
     }
 });
 
-
 router.post('/assignments/:assignmentId/submit', async (req, res) => {
     try {
         const { submissionText, submissionFileUrl } = req.body; // Adjust based on your submission requirements
@@ -107,7 +103,7 @@ router.post('/assignments/:assignmentId/submit', async (req, res) => {
         if (!assignment) {
             return res.status(404).json({ message: 'Assignment not found' });
         }
-        
+
         const student = await User.findById(req.user.id).select('courses');
         if (!student || !student.courses.includes(assignment.course._id)) {
             return res.status(403).json({ message: 'You are not enrolled in the course for this assignment' });
@@ -132,7 +128,6 @@ router.post('/assignments/:assignmentId/submit', async (req, res) => {
         res.status(500).json({ message: 'Failed to submit assignment' });
     }
 });
-
 
 router.get('/submissions/:assignmentId', async (req, res) => {
     try {
