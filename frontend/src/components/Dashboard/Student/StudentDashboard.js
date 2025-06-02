@@ -25,7 +25,6 @@ function StudentDashboard() {
         navigate('/');
     }, [navigate]);
 
-    // Removed 'toast' from dependencies
     const fetchStudentData = useCallback(async () => {
         setLoadingInfo(true);
         try {
@@ -56,7 +55,6 @@ function StudentDashboard() {
         }
     }, [API_BASE_URL, getAuthToken, handleLogout, setStudentInfo, setEnrolledCourses]);
 
-    // Removed 'toast' from dependencies
     const fetchCourseRequests = useCallback(async () => {
         setLoadingRequests(true);
         try {
@@ -86,7 +84,6 @@ function StudentDashboard() {
         }
     }, [API_BASE_URL, getAuthToken, handleLogout, setCourseRequests]);
 
-    // Removed 'toast' from dependencies
     const fetchAssignments = useCallback(async () => {
         setLoadingAssignments(true);
         try {

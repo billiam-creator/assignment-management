@@ -4,6 +4,7 @@
   min-height: 100vh;
   background-color: #f0f2f5;
   font-family: 'Arial', sans-serif;
+  transition: background-color 0.3s ease; /* Smooth background transition */
 }
 
 .sidebar {
@@ -14,6 +15,11 @@
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
+  transition: transform 0.3s ease, width 0.3s ease; /* Transition for mobile sidebar */
+}
+
+.sidebar.mobile-open {
+  transform: translateX(0);
 }
 
 .sidebar h2 {
@@ -21,6 +27,8 @@
   text-align: center;
   margin-bottom: 30px;
   font-size: 1.8em;
+  opacity: 0;
+  animation: fadeIn 0.5s ease-out 0.2s forwards; /* Fade in animation */
 }
 
 .sidebar nav ul {
@@ -32,7 +40,7 @@
 .sidebar nav ul li {
   margin-bottom: 10px;
   border-radius: 5px;
-  transition: background-color 0.3s ease;
+  overflow: hidden; /* Clip hover animation */
 }
 
 .sidebar nav ul li a,
@@ -44,17 +52,35 @@
   font-size: 1.1em;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  position: relative;
+  z-index: 1;
+  transition: color 0.3s ease;
 }
 
-.sidebar nav ul li:hover:not(.active),
-.sidebar nav ul li a:hover:not(.active) {
-  background-color: #34495e;
+.sidebar nav ul li::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.4s ease-in-out;
+  z-index: 0;
+}
+
+.sidebar nav ul li:hover::before,
+.sidebar nav ul li a:hover::before {
+  left: 0;
+}
+
+.sidebar nav ul li:hover:not(.active) a,
+.sidebar nav ul li:hover:not(.active) {
   color: #ffffff;
 }
 
-.sidebar nav ul li.active,
-.sidebar nav ul li a.active {
+.sidebar nav ul li.active a,
+.sidebar nav ul li.active {
   background-color: #3498db;
   font-weight: bold;
   color: #ffffff;
@@ -64,6 +90,7 @@
   flex-grow: 1;
   padding: 30px;
   background-color: #f0f2f5;
+  transition: padding 0.3s ease;
 }
 
 .header {
@@ -75,6 +102,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: slideInDown 0.5s ease-out 0.1s forwards; /* Slide in animation */
 }
 
 .header h1 {
@@ -103,6 +133,27 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+  animation: fadeInUp 0.4s ease-out forwards; /* Fade and slide up animation */
+}
+
+.card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
 }
 
 .card h3 {
@@ -129,10 +180,21 @@
   margin-bottom: 8px;
   border-radius: 5px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-direction: column; /* Stack course details vertically */
-  align-items: flex-start; /* Align text to the left */
+  align-items: flex-start;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateX(-10px);
+  animation: slideInLeft 0.3s ease-out forwards; /* Slide in from left */
+}
+
+.course-list .course-item:nth-child(odd),
+.assignment-list li:nth-child(odd) {
+  animation-delay: 0.1s;
+}
+
+.course-list .course-item:nth-child(even),
+.assignment-list li:nth-child(even) {
+  animation-delay: 0.2s;
 }
 
 .course-list .course-item a,
@@ -140,8 +202,7 @@
   text-decoration: none;
   color: #2c3e50;
   font-weight: bold;
-  flex-grow: 1;
-  width: 100%; /* Take full width */
+  width: 100%;
 }
 
 .course-list .course-item h4 {
@@ -156,10 +217,11 @@
   color: #666;
 }
 
-
 .course-list .course-item a:hover,
 .assignment-list li a:hover {
   color: #3498db;
+  transform: translateX(2px); /* Subtle hover movement */
+  transition: transform 0.2s ease-in-out;
 }
 
 .data-table {
@@ -215,8 +277,14 @@
       padding: 15px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       flex-direction: row; /* Make sidebar items horizontal */
-      justify-content: center; /* Center nav items */
+      justify-content: space-around; /* Distribute nav items */
       flex-wrap: wrap; /* Allow nav items to wrap */
+      align-items: center; /* Center items vertically */
+      transform: translateX(-100%); /* Initially hide sidebar on mobile */
+  }
+
+  .sidebar.mobile-open {
+      transform: translateX(0); /* Slide in sidebar */
   }
 
   .sidebar h2 {
@@ -228,12 +296,14 @@
       flex-wrap: wrap;
       justify-content: center;
       width: 100%;
+      margin-top: 10px; /* Add some space below the (hidden) title */
   }
 
   .sidebar nav ul li {
-      margin: 5px 10px; /* Adjust spacing for horizontal items */
+      margin: 5px; /* Adjust spacing for horizontal items */
       padding: 8px 12px; /* Smaller padding */
       font-size: 0.95em; /* Smaller font */
+      flex-basis: auto; /* Adjust width based on content */
   }
 
   .content {
@@ -273,8 +343,11 @@
 /* For screens smaller than 576px (e.g., mobile phones) */
 @media (max-width: 575px) {
   .sidebar nav ul li {
-      width: calc(50% - 20px); /* Two items per row */
+      width: calc(50% - 10px); /* Two items per row with tighter spacing */
       text-align: center;
+      margin: 5px;
+      padding: 6px 8px;
+      font-size: 0.9em;
   }
 
   .dashboard-grid {
@@ -313,4 +386,30 @@
   .course-list .course-item p {
       font-size: 0.8em;
   }
+
+  .data-table th, .data-table td {
+      padding: 6px;
+      font-size: 0.85em;
+  }
+}
+
+/* Keyframe animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
 }
