@@ -409,3 +409,108 @@
       font-size: 1.2em;
   }
 }
+/* Card Highlight Animation */
+.card-highlight {
+  animation: cardPulse 2s ease-in-out;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.6) !important;
+  border: 2px solid #3b82f6 !important;
+  transform: scale(1.02);
+  z-index: 10;
+  position: relative;
+}
+
+@keyframes cardPulse {
+  0% {
+      box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+      transform: scale(1);
+  }
+  50% {
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.8);
+      transform: scale(1.03);
+  }
+  100% {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+      transform: scale(1.02);
+  }
+}
+
+/* Ensure smooth transitions for all cards */
+.card, .my-courses-section {
+  transition: all 0.3s ease-in-out;
+  position: relative;
+}
+
+/* Enhanced hover effect for navigation links */
+.sidebar nav ul li a {
+  transition: all 0.2s ease-in-out;
+  padding: 8px 12px;
+  border-radius: 4px;
+  display: block;
+}
+
+.sidebar nav ul li a:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  transform: translateX(5px);
+}
+
+/* Active state for navigation links */
+.sidebar nav ul li a.active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* Ensure cards have proper base styling */
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.my-courses-section {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+/* Prevent highlight from affecting layout of other elements */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* Additional visual feedback for clicked links */
+.sidebar nav ul li a:active {
+  transform: scale(0.98);
+}
+
+/* Subtle glow effect during highlight */
+.card-highlight::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6, #3b82f6);
+  border-radius: 10px;
+  z-index: -1;
+  opacity: 0.3;
+  animation: gradientShift 2s ease-in-out;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+      background-position: 0% 50%;
+  }
+  50% {
+      background-position: 100% 50%;
+  }
+}

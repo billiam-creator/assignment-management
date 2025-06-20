@@ -22,6 +22,9 @@ function TeacherDashboard() {
     const [loadingAssignments, setLoadingAssignments] = useState(false);
     const [creatingAssignment, setCreatingAssignment] = useState(false);
 
+    // New state for managing card highlights
+    const [highlightedCard, setHighlightedCard] = useState('');
+
     const API_BASE_URL = 'http://localhost:5000/api/teachers';
     const getAuthToken = useCallback(() => localStorage.getItem('token'), []);
 
@@ -32,6 +35,14 @@ function TeacherDashboard() {
         navigate('/');
     }, [navigate]);
 
+    // New function to handle navigation link clicks with card highlighting
+    const handleNavClick = useCallback((cardType) => {
+        setHighlightedCard(cardType);
+        // Remove highlight after 2 seconds
+        setTimeout(() => {
+            setHighlightedCard('');
+        }, 2000);
+    }, []);
 
     const fetchAssignmentsForCourse = useCallback(async (courseId) => {
         if (!courseId) {
@@ -66,7 +77,6 @@ function TeacherDashboard() {
         }
     }, [API_BASE_URL, getAuthToken, handleLogout, setAssignmentsInSelectedCourse]);
 
-
     const fetchTeacherInfo = useCallback(async () => {
         setLoadingInfo(true);
         try {
@@ -95,7 +105,6 @@ function TeacherDashboard() {
             setLoadingInfo(false);
         }
     }, [API_BASE_URL, getAuthToken, handleLogout, setTeacherInfo]);
-
 
     const fetchMyCourses = useCallback(async () => {
         setLoadingCourses(true);
@@ -201,7 +210,6 @@ function TeacherDashboard() {
         fetchMyCourses();
     }, [navigate, fetchTeacherInfo, fetchMyCourses]);
 
-
     useEffect(() => {
         if (selectedCourseId) {
             fetchAssignmentsForCourse(selectedCourseId);
@@ -209,7 +217,6 @@ function TeacherDashboard() {
             setAssignmentsInSelectedCourse([]);
         }
     }, [selectedCourseId, fetchAssignmentsForCourse]);
-
 
     if (loadingInfo || loadingCourses) {
         return <div className="dashboard-loading">Loading teacher dashboard...</div>;
@@ -222,9 +229,30 @@ function TeacherDashboard() {
                 <nav>
                     <ul>
                         <li><Link to="/teacher/dashboard" className="active">Dashboard</Link></li>
-                        <li><Link to="/teacher/my-courses">My Courses</Link></li>
-                        <li><Link to="/teacher/assignments">Assignments</Link></li>
-                        <li><Link to="/teacher/submissions">Submissions</Link></li>
+                        <li>
+                            <Link 
+                                to="/teacher/my-courses" 
+                                onClick={() => handleNavClick('courses')}
+                            >
+                                My Courses
+                            </Link>
+                        </li>
+                        <li>
+                            <Link 
+                                to="/teacher/assignments" 
+                                onClick={() => handleNavClick('assignments')}
+                            >
+                                Assignments
+                            </Link>
+                        </li>
+                        <li>
+                            <Link 
+                                to="/teacher/submissions" 
+                                onClick={() => handleNavClick('assignments')}
+                            >
+                                Submissions
+                            </Link>
+                        </li>
                         <li onClick={handleLogout} style={{ cursor: 'pointer' }}>Logout</li>
                     </ul>
                 </nav>
@@ -235,7 +263,7 @@ function TeacherDashboard() {
                     <p>Welcome, {teacherInfo?.name || teacherInfo?.username || 'Teacher'}!</p>
                 </div>
 
-                <div className="my-courses-section">
+                <div className={`my-courses-section ${highlightedCard === 'courses' ? 'card-highlight' : ''}`}>
                     <h2>My Courses</h2>
                     {myCourses.length > 0 ? (
                         <select onChange={handleCourseSelect} value={selectedCourseId || ''}>
@@ -251,7 +279,7 @@ function TeacherDashboard() {
 
                 {selectedCourseId && (
                     <div className="dashboard-grid">
-                        <div className="card enrolled-students-card">
+                        <div className={`card enrolled-students-card ${highlightedCard === 'courses' ? 'card-highlight' : ''}`}>
                             <h3>Students in {myCourses.find(c => c._id === selectedCourseId)?.name || 'Selected Course'}</h3>
                             {studentsInSelectedCourse.length > 0 ? (
                                 <table className="data-table">
@@ -275,7 +303,7 @@ function TeacherDashboard() {
                             )}
                         </div>
 
-                        <div className="card assignments-card">
+                        <div className={`card assignments-card ${highlightedCard === 'assignments' ? 'card-highlight' : ''}`}>
                             <h3>Assignments for {myCourses.find(c => c._id === selectedCourseId)?.name || 'Selected Course'}</h3>
                             {loadingAssignments ? (
                                 <p>Loading assignments...</p>
